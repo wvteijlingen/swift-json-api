@@ -19,48 +19,48 @@ public typealias DeserializationResult = (store: ResourceStore?, meta: [String: 
 */
 struct ResourceClassMap {
 
-  /// The registered resource type/class pairs.
-  private var registeredClasses: [String: Resource.Type] = [:]
+	/// The registered resource type/class pairs.
+	private var registeredClasses: [String: Resource.Type] = [:]
 
-  /**
-	 Register a Resource subclass.
-	 Example: `classMap.register(User.self)`
+	/**
+	Register a Resource subclass.
+	Example: `classMap.register(User.self)`
 
-	 :param: type The Type of the subclass to register.
-	 */
-  mutating func registerClass(type: Resource.Type) {
-    let instance = type()
-    self.registeredClasses[instance.resourceType] = type
-  }
+	:param: type The Type of the subclass to register.
+	*/
+	mutating func registerClass(type: Resource.Type) {
+		let instance = type()
+		self.registeredClasses[instance.resourceType] = type
+	}
 
-  /**
-	 Unregister a Resource subclass. If the type was not prevously registered, nothing happens.
-	 Example: `classMap.unregister(User.self)`
+	/**
+	Unregister a Resource subclass. If the type was not prevously registered, nothing happens.
+	Example: `classMap.unregister(User.self)`
 
-	 :param: type The Type of the subclass to unregister.
-	 */
-  mutating func unregisterClass(type: Resource.Type) {
-    let instance = type()
-    self.registeredClasses[instance.resourceType] = nil
-  }
+	:param: type The Type of the subclass to unregister.
+	*/
+	mutating func unregisterClass(type: Resource.Type) {
+		let instance = type()
+		self.registeredClasses[instance.resourceType] = nil
+	}
 
-  /**
-	 Returns the Resource.Type into which a resource with the given type should be mapped.
+	/**
+	Returns the Resource.Type into which a resource with the given type should be mapped.
 
-	 :param: resourceType The resource type for which to return the matching class.
+	:param: resourceType The resource type for which to return the matching class.
 
-	 :returns: The Resource.Type that matches the given resource type.
-	 */
-  func classForResourceType(resourceType: String) -> Resource.Type {
-    return registeredClasses[resourceType]!
-  }
+	:returns: The Resource.Type that matches the given resource type.
+	*/
+	func classForResourceType(resourceType: String) -> Resource.Type {
+		return registeredClasses[resourceType]!
+	}
 
-  /**
-	 *  Returns the Resource.Type into which a resource with the given type should be mapped.
-	 */
-  subscript(resourceType: String) -> Resource.Type {
-    return self.classForResourceType(resourceType)
-  }
+	/**
+	*  Returns the Resource.Type into which a resource with the given type should be mapped.
+	*/
+	subscript(resourceType: String) -> Resource.Type {
+		return self.classForResourceType(resourceType)
+	}
 }
 
 // MARK: -
@@ -72,24 +72,24 @@ The serialization mode.
 - DirtyAttributes:	Serialize only dirty attributes and all relationships.
 */
 public enum SerializationMode {
-  case AllAttributes, DirtyAttributes
+	case AllAttributes, DirtyAttributes
 }
 
 // MARK: -
 
 public protocol SerializerProtocol {
-  // Class mapping
-  func registerClass(type: Resource.Type)
-  func unregisterClass(type: Resource.Type)
-  func classNameForResourceType(resourceType: String) -> Resource.Type
+	// Class mapping
+	func registerClass(type: Resource.Type)
+	func unregisterClass(type: Resource.Type)
+	func classNameForResourceType(resourceType: String) -> Resource.Type
 
-  // Deserializing
-  func deserializeData(data: NSData) -> DeserializationResult
-  func deserializeData(data: NSData, usingStore store: ResourceStore) -> DeserializationResult
-  func deserializeError(data: NSData, withResonseStatus responseStatus: Int) -> NSError
+	// Deserializing
+	func deserializeData(data: NSData) -> DeserializationResult
+	func deserializeData(data: NSData, usingStore store: ResourceStore) -> DeserializationResult
+	func deserializeError(data: NSData, withResonseStatus responseStatus: Int) -> NSError
 
-  // Serializing
-  func serializeResources(resources: [Resource], mode: SerializationMode) -> [String: AnyObject]
+	// Serializing
+	func serializeResources(resources: [Resource], mode: SerializationMode) -> [String: AnyObject]
 }
 
 /**
@@ -99,121 +99,121 @@ public protocol SerializerProtocol {
 */
 class JSONAPISerializer: SerializerProtocol {
 
-  /// The class map that holds information about resource type/class mapping.
-  private var classMap: ResourceClassMap = ResourceClassMap()
+	/// The class map that holds information about resource type/class mapping.
+	private var classMap: ResourceClassMap = ResourceClassMap()
 
 
-  //MARK: Class mapping
+	//MARK: Class mapping
 
-  /**
-	 Register a Resource subclass with this serializer.
-	 Example: `classMap.register(User.self)`
+	/**
+	Register a Resource subclass with this serializer.
+	Example: `classMap.register(User.self)`
 
-	 :param: type The Type of the subclass to register.
-	 */
-  func registerClass(type: Resource.Type) {
-    self.classMap.registerClass(type)
-  }
+	:param: type The Type of the subclass to register.
+	*/
+	func registerClass(type: Resource.Type) {
+		self.classMap.registerClass(type)
+	}
 
-  /**
-	 Unregister a Resource subclass from this serializer. If the type was not prevously registered, nothing happens.
-	 Example: `classMap.unregister(User.self)`
+	/**
+	Unregister a Resource subclass from this serializer. If the type was not prevously registered, nothing happens.
+	Example: `classMap.unregister(User.self)`
 
-	 :param: type The Type of the subclass to unregister.
-	 */
-  func unregisterClass(type: Resource.Type) {
-    self.classMap.unregisterClass(type)
-  }
+	:param: type The Type of the subclass to unregister.
+	*/
+	func unregisterClass(type: Resource.Type) {
+		self.classMap.unregisterClass(type)
+	}
 
-  /**
-	 Returns the Resource.Type into which a resource with the given type should be mapped.
+	/**
+	Returns the Resource.Type into which a resource with the given type should be mapped.
 
-	 :param: resourceType The resource type for which to return the matching class.
+	:param: resourceType The resource type for which to return the matching class.
 
-	 :returns: The Resource.Type that matches the given resource type.
-	 */
-  func classNameForResourceType(resourceType: String) -> Resource.Type {
-    return self.classMap[resourceType]
-  }
-
-
-  // MARK: Serializing
-
-  /**
-	 Deserializes the given data into a SerializationResult. This is a thin wrapper around
-	 a DeserializeOperation that does the actual deserialization.
-
-	 :param: data The data to deserialize.
-
-	 :returns: A DeserializationResult that contains either a ResourceStore or an error.
-	 */
-  func deserializeData(data: NSData) -> DeserializationResult {
-    let mappingOperation = DeserializeOperation(data: data, classMap: self.classMap)
-    mappingOperation.start()
-    return mappingOperation.result!
-  }
-
-  /**
-	 Deserializes the given data into a SerializationResult. This is a thin wrapper around
-	 a DeserializeOperation that does the actual deserialization.
-
-	 Use this method if you want to deserialize onto existing Resource instances. Otherwise, use
-	 the regular `deserializeData` method.
-
-	 :param: data  The data to deserialize.
-	 :param: store A ResourceStore that contains Resource instances onto which data will be deserialize.
-
-	 :returns: A DeserializationResult that contains either a ResourceStore or an error.
-	 */
-
-  func deserializeData(data: NSData, usingStore store: ResourceStore) -> DeserializationResult {
-    let mappingOperation = DeserializeOperation(data: data, store: store, classMap: self.classMap)
-    mappingOperation.start()
-    return mappingOperation.result!
-  }
+	:returns: The Resource.Type that matches the given resource type.
+	*/
+	func classNameForResourceType(resourceType: String) -> Resource.Type {
+		return self.classMap[resourceType]
+	}
 
 
-  /**
-	 Deserializes the given data into an NSError. Use this method if the server response is not in the
-	 200 successful range.
+	// MARK: Serializing
 
-	 The error returned will contain the error code specified in the `error` section of the response.
-	 If no error code is available, the given HTTP response status code will be used instead.
-	 If the `error` section contains a `title` key, it's value will be used for the NSLocalizedDescriptionKey.
+	/**
+	Deserializes the given data into a SerializationResult. This is a thin wrapper around
+	a DeserializeOperation that does the actual deserialization.
 
-	 :param: data           The data to deserialize.
-	 :param: responseStatus The HTTP response status which will be used when an error code is absent in the data.
+	:param: data The data to deserialize.
 
-	 :returns: A NSError deserialized from the given data.
-	 */
-  func deserializeError(data: NSData, withResonseStatus responseStatus: Int) -> NSError {
-    let json = JSON(data: data as NSData!)
+	:returns: A DeserializationResult that contains either a ResourceStore or an error.
+	*/
+	func deserializeData(data: NSData) -> DeserializationResult {
+		let mappingOperation = DeserializeOperation(data: data, classMap: self.classMap)
+		mappingOperation.start()
+		return mappingOperation.result!
+	}
 
-    let code = json["errors"][0]["id"].integerValue ?? responseStatus
+	/**
+	Deserializes the given data into a SerializationResult. This is a thin wrapper around
+	a DeserializeOperation that does the actual deserialization.
 
-    var userInfo: [String : AnyObject]?
+	Use this method if you want to deserialize onto existing Resource instances. Otherwise, use
+	the regular `deserializeData` method.
 
-    if let errorTitle = json["errors"][0]["title"].stringValue {
-      userInfo = [NSLocalizedDescriptionKey: errorTitle]
-    }
+	:param: data  The data to deserialize.
+	:param: store A ResourceStore that contains Resource instances onto which data will be deserialize.
 
-    return NSError(domain: SPINE_ERROR_DOMAIN, code: code, userInfo: userInfo)
-  }
+	:returns: A DeserializationResult that contains either a ResourceStore or an error.
+	*/
 
-  /**
-	 Serializes the given Resources into a multidimensional dictionary/array structure
-	 that can be passed to NSJSONSerialization.
+	func deserializeData(data: NSData, usingStore store: ResourceStore) -> DeserializationResult {
+		let mappingOperation = DeserializeOperation(data: data, store: store, classMap: self.classMap)
+		mappingOperation.start()
+		return mappingOperation.result!
+	}
 
-	 :param: resources The resources to serialize.
-	 :param: mode      The serialization mode to use.
 
-	 :returns: A multidimensional dictionary/array structure.
-	 */
-  func serializeResources(resources: [Resource], mode: SerializationMode) -> [String: AnyObject] {
-    let mappingOperation = SerializeOperation(resources: resources, mode: mode)
-    mappingOperation.start()
-    return mappingOperation.result!
-  }
+	/**
+	Deserializes the given data into an NSError. Use this method if the server response is not in the
+	200 successful range.
+
+	The error returned will contain the error code specified in the `error` section of the response.
+	If no error code is available, the given HTTP response status code will be used instead.
+	If the `error` section contains a `title` key, it's value will be used for the NSLocalizedDescriptionKey.
+
+	:param: data           The data to deserialize.
+	:param: responseStatus The HTTP response status which will be used when an error code is absent in the data.
+
+	:returns: A NSError deserialized from the given data.
+	*/
+	func deserializeError(data: NSData, withResonseStatus responseStatus: Int) -> NSError {
+		let json = JSON(data: data as NSData!)
+
+		let code = json["errors"][0]["id"].integerValue ?? responseStatus
+
+		var userInfo: [String : AnyObject]?
+
+		if let errorTitle = json["errors"][0]["title"].stringValue {
+			userInfo = [NSLocalizedDescriptionKey: errorTitle]
+		}
+
+		return NSError(domain: SPINE_ERROR_DOMAIN, code: code, userInfo: userInfo)
+	}
+
+	/**
+	Serializes the given Resources into a multidimensional dictionary/array structure
+	that can be passed to NSJSONSerialization.
+
+	:param: resources The resources to serialize.
+	:param: mode      The serialization mode to use.
+
+	:returns: A multidimensional dictionary/array structure.
+	*/
+	func serializeResources(resources: [Resource], mode: SerializationMode) -> [String: AnyObject] {
+		let mappingOperation = SerializeOperation(resources: resources, mode: mode)
+		mappingOperation.start()
+		return mappingOperation.result!
+	}
 }
 
 
@@ -227,421 +227,421 @@ class JSONAPISerializer: SerializerProtocol {
 */
 class DeserializeOperation: NSOperation {
 
-  // Input
-  private var classMap: ResourceClassMap
-  private var data: JSON
-
-  // Output
-  private var store: ResourceStore
-  private var meta: [String: Meta] = [:]
-
-
-  private lazy var formatter = {
-    Formatter()
-    }()
-
-  var result: DeserializationResult?
-
-  init(data: NSData, classMap: ResourceClassMap) {
-    self.data = JSON(data: data as NSData!)
-    self.classMap = classMap
-    self.store = ResourceStore()
-    super.init()
-  }
-
-  init(data: NSData, store: ResourceStore, classMap: ResourceClassMap) {
-    self.data = JSON(data: data as NSData!)
-    self.classMap = classMap
-    self.store = store
-    super.init()
-  }
-
-  override func main() {
-    // Check if the given data is in the expected format
-    if (self.data.dictionaryValue == nil) {
-      let error = NSError(domain: SPINE_ERROR_DOMAIN, code: 0, userInfo: [NSLocalizedDescriptionKey: "The given JSON representation was not as expected."])
-      self.result = DeserializationResult(nil, nil, error)
-      return
-    }
-
-    // Extract resources
-    for(key: String, data: JSON) in self.data.dictionaryValue! {
-      // Linked resources for compound documents
-      if key == "linked" {
-        for (linkedResourceType, linkedResources) in data.dictionaryValue! {
-          for representation in linkedResources.arrayValue! {
-            self.deserializeSingleRepresentation(representation, withResourceType: linkedResourceType)
-          }
-        }
-
-      } else if key != "links" && key != "meta" {
-        // Multiple resources
-        if let representations = data.arrayValue {
-          for representation in representations {
-            self.deserializeSingleRepresentation(representation, withResourceType: key)
-          }
-
-          // Single resource
-        } else {
-          self.deserializeSingleRepresentation(data, withResourceType: key)
-        }
-      }
-    }
-
-    // Extract top level links
-    self.extractLinks()
-
-    // Extract meta
-    self.extractMeta()
-
-    // Resolve relations in the store
-    self.resolveRelations()
-
-    // Start dirty observing for all resources
-    for resource in self.store.allResources() {
-      resource.dirtyObservingActive = true
-    }
-
-    // Create a result
-    self.result = DeserializationResult(self.store, self.meta, nil)
-  }
-
-  /**
-  Maps a single resource representation into a resource object of the given type.
-
-  :param: representation The JSON representation of a single resource.
-  :param: resourceType   The type of resource onto which to map the representation.
-  */
-  private func deserializeSingleRepresentation(representation: JSON, withResourceType resourceType: String) {
-    assert(representation.dictionaryValue != nil, "The given JSON representation was not of type 'object' (dictionary).")
-
-    // Find existing resource in the store, or create a new resource.
-    var resource: Resource
-    var isExistingResource: Bool
-
-    if let existingResource = self.store.resource(resourceType, identifier: representation["id"].stringValue!) {
-      resource = existingResource
-      isExistingResource = true
-    } else {
-      resource = self.classMap[resourceType]() as Resource
-      isExistingResource = false
-    }
-
-    resource.dirtyObservingActive = false
-
-    // Extract data into resource
-    self.extractID(representation, intoResource: resource)
-    self.extractHref(representation, intoResource: resource)
-    self.extractAttributes(representation, intoResource: resource)
-    self.extractRelationships(representation, intoResource: resource)
-
-    // Add resource to store if needed
-    if !isExistingResource {
-      self.store.add(resource)
-    }
-  }
-
-
-  // MARK: Special attributes
-
-  /**
-	 Extracts the resource ID from the serialized data into the given resource.
-
-	 :param: serializedData The data from which to extract the ID.
-	 :param: resource       The resource into which to extract the ID.
-	 */
-  private func extractID(serializedData: JSON, intoResource resource: Resource) {
-    if let ID = serializedData["id"].stringValue {
-      resource.resourceID = ID
-    }
-  }
-
-  /**
-	 Extracts the resource href from the serialized data into the given resource.
-
-	 :param: serializedData The data from which to extract the href.
-	 :param: resource       The resource into which to extract the href.
-	 */
-  private func extractHref(serializedData: JSON, intoResource resource: Resource) {
-    if let href = serializedData["href"].stringValue {
-      resource.resourceLocation = href
-    }
-  }
-
-
-  // MARK: Attributes
-
-  /**
-	 Extracts the attributes from the given data into the given resource.
-
-	 This method loops over all the attributes in the passed resource, maps the attribute name
-	 to the key for the serialized form and invokes `extractAttribute`. It then formats the extracted
-	 attribute and sets the formatted value on the resource.
-
-	 :param: serializedData The data from which to extract the attributes.
-	 :param: resource       The resource into which to extract the attributes.
-	 */
-  private func extractAttributes(serializedData: JSON, intoResource resource: Resource) {
-    for (attributeName, attribute) in resource.persistentAttributes {
-      if attribute.isRelationship() {
-        continue
-      }
-
-      let key = attribute.representationName ?? attributeName
-
-      if let extractedValue: AnyObject = self.extractAttribute(serializedData, key: key) {
-        let formattedValue: AnyObject = self.formatter.deserialize(extractedValue, ofType: attribute.type)
-        resource.setValue(formattedValue, forKey: attributeName)
-      }
-    }
-  }
-
-  /**
-	 Extracts the value for the given key from the passed serialized data.
-
-	 :param: serializedData The data from which to extract the attribute.
-	 :param: key            The key for which to extract the value from the data.
-
-	 :returns: The extracted value or nil if no attribute with the given key was found in the data.
-	 */
-  private func extractAttribute(serializedData: JSON, key: String) -> AnyObject? {
-    if let value: AnyObject = serializedData[key].anyObject {
-      return value
-    }
-
-    return nil
-  }
-
-
-  // MARK: Relationships
-
-  /**
-	 Extracts the relationships from the given data into the given resource.
-
-	 This method loops over all the relationships in the passed resource, maps the relationship name
-	 to the key for the serialized form and invokes `extractToOneRelationship` or `extractToManyRelationship`.
-	 It then sets the extracted ResourceRelationship on the resource.
-
-	 :param: serializedData The data from which to extract the relationships.
-	 :param: resource       The resource into which to extract the relationships.
-	 */
-  private func extractRelationships(serializedData: JSON, intoResource resource: Resource) {
-    for (attributeName, attribute) in resource.persistentAttributes {
-      if !attribute.isRelationship() {
-        continue
-      }
-
-      let key = attribute.representationName ?? attributeName
-
-      switch attribute.type {
-      case .ToOne:
-        if let extractedRelationship = self.extractToOneRelationship(serializedData, key: key, resource: resource) {
-          resource.links[attributeName] = extractedRelationship
-        }
-      case .ToMany:
-        if let extractedRelationship = self.extractToManyRelationship(serializedData, key: key, resource: resource) {
-          resource.links[attributeName] = extractedRelationship
-        }
-      default: ()
-      }
-    }
-  }
-
-  /**
-	 Extracts the to-one relationship for the given key from the passed serialized data.
-
-	 This method supports both the single ID form and the resource object forms.
-
-	 :param: serializedData The data from which to extract the relationship.
-	 :param: key            The key for which to extract the relationship from the data.
-
-	 :returns: The extracted relationship or nil if no relationship with the given key was found in the data.
-  */
-  private func extractToOneRelationship(serializedData: JSON, key: String, resource: Resource) -> ResourceLink? {
-    // Single ID form
-    if let ID = serializedData["links"][key].stringValue {
-      return ResourceLink(href: nil, ID: ID, type: nil)
-    }
-
-      // Resource object form
-    else if let linkData = serializedData["links"][key].dictionaryValue {
-      var href: String?, ID: String?, type: String?
-
-      if linkData["href"] != nil {
-        href = linkData["href"]!.stringValue
-      }
-
-      if linkData["id"] != nil {
-        ID = linkData["id"]!.stringValue
-      }
-
-      if linkData["type"] != nil {
-        type = linkData["type"]!.stringValue
-      }
-
-      return ResourceLink(href: href, ID: ID, type: type)
-    }
-
-    return nil
-  }
-
-  /**
-	 Extracts the to-many relationship for the given key from the passed serialized data.
-
-	 This method supports both the array of IDs form and the resource object forms.
-
-	 :param: serializedData The data from which to extract the relationship.
-	 :param: key            The key for which to extract the relationship from the data.
-
-	 :returns: The extracted relationship or nil if no relationship with the given key was found in the data.
-  */
-  private func extractToManyRelationship(serializedData: JSON, key: String, resource: Resource) -> ResourceLink? {
-    // ID array form
-    if let IDs = serializedData["links"][key].arrayValue {
-      return ResourceLink(href: nil, IDs: IDs.map { return $0.stringValue! }, type: nil)
-    }
-
-      // Resource object form
-    else if let linkData = serializedData["links"][key].dictionaryValue {
-      var href: String?, IDs: [String]?, type: String?
-
-      if linkData["href"] != nil {
-        href = linkData["href"]!.stringValue
-      }
-
-      if linkData["ids"] != nil {
-        IDs = linkData["ids"]!.arrayValue!.map { return $0.stringValue! }
-      }
-
-      if linkData["type"] != nil {
-        type = linkData["type"]!.stringValue
-      }
-
-      return ResourceLink(href: href, IDs: IDs, type: type)
-    }
-
-    return nil
-  }
-
-  /**
-	 Resolves the relations of the resources in the store.
-  */
-  private func resolveRelations() {
-    for resource in self.store.allResources() {
-
-      for (linkName: String, link: ResourceLink) in resource.links {
-        let type = link.type ?? linkName
-
-        if resource.persistentAttributes[linkName]!.type == ResourceAttribute.AttributeType.ToOne {
-
-          // We can only resolve if an ID is known
-          if let ID = link.IDs?.first {
-
-            // Find target of relation in store
-            if let targetResource = store.resource(type, identifier: ID) {
-              resource.setValue(targetResource, forKey: linkName)
-            } else {
-              // Target resource was not found in store, create a placeholder
-              let placeholderResource = self.classMap[type]() as Resource
-              placeholderResource.resourceID = ID
-              resource.setValue(placeholderResource, forKey: linkName)
-            }
-          }
-
-        } else if resource.persistentAttributes[linkName]!.type == ResourceAttribute.AttributeType.ToMany {
-          var targetResources: [Resource] = []
-
-          // We can only resolve if IDs are known
-          if let IDs = link.IDs {
-
-            for ID in IDs {
-              // Find target of relation in store
-              if let targetResource = store.resource(type, identifier: ID) {
-                targetResources.append(targetResource)
-              } else {
-                // Target resource was not found in store, create a placeholder
-                let placeholderResource = self.classMap[type]() as Resource
-                placeholderResource.resourceID = ID
-                targetResources.append(placeholderResource)
-              }
-
-              resource.setValue(targetResources, forKey: linkName)
-            }
-          }
-        }
-      }
-    }
-  }
-
-
-  // MARK: Links
-
-  /**
-  Extracts the top level links from the serialized data.
-
-  Each extracted link is added the associated resources in on the following ways:
-  - If the associated resource already contains a link for the given relation,
-  the existing link is interpolated and merged with data from the top level link.
-  Data on the existing link has precedence over the top level data.
-  - If the ssociated resource does not contain a link for the given relation,
-  the top level link is added to the resource after interpolation.
-  */
-  private func extractLinks() {
-    if let links = self.data["links"].dictionaryValue {
-
-      // Loop through all links in the serialized data
-      for (linkName, linkData) in links {
-
-        // Explode compound template name
-        let templateNameComponents = linkName.componentsSeparatedByString(".")
-        let templateResourceType = templateNameComponents[0]
-        let templateResourceKey = templateNameComponents[1]
-
-        // Find all resources to which to apply this template
-        for resource in self.store.resourcesWithName(templateResourceType) {
-
-          // Find existing link to augment or create a new link
-          var augmentedLink = resource.links[templateResourceKey] ?? ResourceLink()
-
-          // Assign the interpolated href if a href wasn't specified already
-          if augmentedLink.href == nil {
-
-            // Interpolate URL
-            if let templateHref = linkData["href"].stringValue {
-              var interpolated: NSString = templateHref as NSString
-              interpolated = (interpolated as NSString).stringByReplacingOccurrencesOfString("{\(templateResourceType).id}", withString: resource.resourceID!)
-              interpolated = (interpolated as NSString).stringByReplacingOccurrencesOfString("{\(templateResourceType).\(templateResourceKey)}", withString: augmentedLink.joinedIDs)
-              augmentedLink.href = interpolated
-            }
-          }
-
-          // Assign the type if the type wasn't specified already
-          if augmentedLink.type == nil {
-            augmentedLink.type = linkData["type"].stringValue
-          }
-
-          resource.links[templateResourceKey] = augmentedLink
-        }
-      }
-    }
-  }
-
-
-  // MARK: Meta
-
-  private func extractMeta() {
-    var metaObjects: [String: Meta] = [:]
-
-    if let meta = self.data["meta"].dictionaryValue {
-      for (metaKey, metaData) in meta {
-        let meta = self.classMap["_meta"]() as Meta
-        self.extractAttributes(metaData, intoResource: meta)
-        metaObjects[metaKey] = meta
-      }
-    }
-
-    self.meta = metaObjects
-  }
+	// Input
+	private var classMap: ResourceClassMap
+	private var data: JSON
+
+	// Output
+	private var store: ResourceStore
+	private var meta: [String: Meta] = [:]
+
+
+	private lazy var formatter = {
+		Formatter()
+		}()
+
+	var result: DeserializationResult?
+
+	init(data: NSData, classMap: ResourceClassMap) {
+		self.data = JSON(data: data as NSData!)
+		self.classMap = classMap
+		self.store = ResourceStore()
+		super.init()
+	}
+
+	init(data: NSData, store: ResourceStore, classMap: ResourceClassMap) {
+		self.data = JSON(data: data as NSData!)
+		self.classMap = classMap
+		self.store = store
+		super.init()
+	}
+
+	override func main() {
+		// Check if the given data is in the expected format
+		if (self.data.dictionaryValue == nil) {
+			let error = NSError(domain: SPINE_ERROR_DOMAIN, code: 0, userInfo: [NSLocalizedDescriptionKey: "The given JSON representation was not as expected."])
+			self.result = DeserializationResult(nil, nil, error)
+			return
+		}
+
+		// Extract resources
+		for(key: String, data: JSON) in self.data.dictionaryValue! {
+			// Linked resources for compound documents
+			if key == "linked" {
+				for (linkedResourceType, linkedResources) in data.dictionaryValue! {
+					for representation in linkedResources.arrayValue! {
+						self.deserializeSingleRepresentation(representation, withResourceType: linkedResourceType)
+					}
+				}
+
+			} else if key != "links" && key != "meta" {
+				// Multiple resources
+				if let representations = data.arrayValue {
+					for representation in representations {
+						self.deserializeSingleRepresentation(representation, withResourceType: key)
+					}
+
+					// Single resource
+				} else {
+					self.deserializeSingleRepresentation(data, withResourceType: key)
+				}
+			}
+		}
+
+		// Extract top level links
+		self.extractLinks()
+
+		// Extract meta
+		self.extractMeta()
+
+		// Resolve relations in the store
+		self.resolveRelations()
+
+		// Start dirty observing for all resources
+		for resource in self.store.allResources() {
+			resource.dirtyObservingActive = true
+		}
+
+		// Create a result
+		self.result = DeserializationResult(self.store, self.meta, nil)
+	}
+
+	/**
+	Maps a single resource representation into a resource object of the given type.
+
+	:param: representation The JSON representation of a single resource.
+	:param: resourceType   The type of resource onto which to map the representation.
+	*/
+	private func deserializeSingleRepresentation(representation: JSON, withResourceType resourceType: String) {
+		assert(representation.dictionaryValue != nil, "The given JSON representation was not of type 'object' (dictionary).")
+
+		// Find existing resource in the store, or create a new resource.
+		var resource: Resource
+		var isExistingResource: Bool
+
+		if let existingResource = self.store.resource(resourceType, identifier: representation["id"].stringValue!) {
+			resource = existingResource
+			isExistingResource = true
+		} else {
+			resource = self.classMap[resourceType]() as Resource
+			isExistingResource = false
+		}
+
+		resource.dirtyObservingActive = false
+
+		// Extract data into resource
+		self.extractID(representation, intoResource: resource)
+		self.extractHref(representation, intoResource: resource)
+		self.extractAttributes(representation, intoResource: resource)
+		self.extractRelationships(representation, intoResource: resource)
+
+		// Add resource to store if needed
+		if !isExistingResource {
+			self.store.add(resource)
+		}
+	}
+
+
+	// MARK: Special attributes
+
+	/**
+	Extracts the resource ID from the serialized data into the given resource.
+
+	:param: serializedData The data from which to extract the ID.
+	:param: resource       The resource into which to extract the ID.
+	*/
+	private func extractID(serializedData: JSON, intoResource resource: Resource) {
+		if let ID = serializedData["id"].stringValue {
+			resource.resourceID = ID
+		}
+	}
+
+	/**
+	Extracts the resource href from the serialized data into the given resource.
+
+	:param: serializedData The data from which to extract the href.
+	:param: resource       The resource into which to extract the href.
+	*/
+	private func extractHref(serializedData: JSON, intoResource resource: Resource) {
+		if let href = serializedData["href"].stringValue {
+			resource.resourceLocation = href
+		}
+	}
+
+
+	// MARK: Attributes
+
+	/**
+	Extracts the attributes from the given data into the given resource.
+
+	This method loops over all the attributes in the passed resource, maps the attribute name
+	to the key for the serialized form and invokes `extractAttribute`. It then formats the extracted
+	attribute and sets the formatted value on the resource.
+
+	:param: serializedData The data from which to extract the attributes.
+	:param: resource       The resource into which to extract the attributes.
+	*/
+	private func extractAttributes(serializedData: JSON, intoResource resource: Resource) {
+		for (attributeName, attribute) in resource.persistentAttributes {
+			if attribute.isRelationship() {
+				continue
+			}
+
+			let key = attribute.representationName ?? attributeName
+
+			if let extractedValue: AnyObject = self.extractAttribute(serializedData, key: key) {
+				let formattedValue: AnyObject = self.formatter.deserialize(extractedValue, ofType: attribute.type)
+				resource.setValue(formattedValue, forKey: attributeName)
+			}
+		}
+	}
+
+	/**
+	Extracts the value for the given key from the passed serialized data.
+
+	:param: serializedData The data from which to extract the attribute.
+	:param: key            The key for which to extract the value from the data.
+
+	:returns: The extracted value or nil if no attribute with the given key was found in the data.
+	*/
+	private func extractAttribute(serializedData: JSON, key: String) -> AnyObject? {
+		if let value: AnyObject = serializedData[key].anyObject {
+			return value
+		}
+
+		return nil
+	}
+
+
+	// MARK: Relationships
+
+	/**
+	Extracts the relationships from the given data into the given resource.
+
+	This method loops over all the relationships in the passed resource, maps the relationship name
+	to the key for the serialized form and invokes `extractToOneRelationship` or `extractToManyRelationship`.
+	It then sets the extracted ResourceRelationship on the resource.
+
+	:param: serializedData The data from which to extract the relationships.
+	:param: resource       The resource into which to extract the relationships.
+	*/
+	private func extractRelationships(serializedData: JSON, intoResource resource: Resource) {
+		for (attributeName, attribute) in resource.persistentAttributes {
+			if !attribute.isRelationship() {
+				continue
+			}
+
+			let key = attribute.representationName ?? attributeName
+
+			switch attribute.type {
+			case .ToOne:
+				if let extractedRelationship = self.extractToOneRelationship(serializedData, key: key, resource: resource) {
+					resource.links[attributeName] = extractedRelationship
+				}
+			case .ToMany:
+				if let extractedRelationship = self.extractToManyRelationship(serializedData, key: key, resource: resource) {
+					resource.links[attributeName] = extractedRelationship
+				}
+			default: ()
+			}
+		}
+	}
+
+	/**
+	Extracts the to-one relationship for the given key from the passed serialized data.
+
+	This method supports both the single ID form and the resource object forms.
+
+	:param: serializedData The data from which to extract the relationship.
+	:param: key            The key for which to extract the relationship from the data.
+
+	:returns: The extracted relationship or nil if no relationship with the given key was found in the data.
+	*/
+	private func extractToOneRelationship(serializedData: JSON, key: String, resource: Resource) -> ResourceLink? {
+		// Single ID form
+		if let ID = serializedData["links"][key].stringValue {
+			return ResourceLink(href: nil, ID: ID, type: nil)
+		}
+
+			// Resource object form
+		else if let linkData = serializedData["links"][key].dictionaryValue {
+			var href: String?, ID: String?, type: String?
+
+			if linkData["href"] != nil {
+				href = linkData["href"]!.stringValue
+			}
+
+			if linkData["id"] != nil {
+				ID = linkData["id"]!.stringValue
+			}
+
+			if linkData["type"] != nil {
+				type = linkData["type"]!.stringValue
+			}
+
+			return ResourceLink(href: href, ID: ID, type: type)
+		}
+
+		return nil
+	}
+
+	/**
+	Extracts the to-many relationship for the given key from the passed serialized data.
+
+	This method supports both the array of IDs form and the resource object forms.
+
+	:param: serializedData The data from which to extract the relationship.
+	:param: key            The key for which to extract the relationship from the data.
+
+	:returns: The extracted relationship or nil if no relationship with the given key was found in the data.
+	*/
+	private func extractToManyRelationship(serializedData: JSON, key: String, resource: Resource) -> ResourceLink? {
+		// ID array form
+		if let IDs = serializedData["links"][key].arrayValue {
+			return ResourceLink(href: nil, IDs: IDs.map { return $0.stringValue! }, type: nil)
+		}
+
+			// Resource object form
+		else if let linkData = serializedData["links"][key].dictionaryValue {
+			var href: String?, IDs: [String]?, type: String?
+
+			if linkData["href"] != nil {
+				href = linkData["href"]!.stringValue
+			}
+
+			if linkData["ids"] != nil {
+				IDs = linkData["ids"]!.arrayValue!.map { return $0.stringValue! }
+			}
+
+			if linkData["type"] != nil {
+				type = linkData["type"]!.stringValue
+			}
+
+			return ResourceLink(href: href, IDs: IDs, type: type)
+		}
+
+		return nil
+	}
+
+	/**
+	Resolves the relations of the resources in the store.
+	*/
+	private func resolveRelations() {
+		for resource in self.store.allResources() {
+
+			for (linkName: String, link: ResourceLink) in resource.links {
+				let type = link.type ?? linkName
+
+				if resource.persistentAttributes[linkName]!.type == ResourceAttribute.AttributeType.ToOne {
+
+					// We can only resolve if an ID is known
+					if let ID = link.IDs?.first {
+
+						// Find target of relation in store
+						if let targetResource = store.resource(type, identifier: ID) {
+							resource.setValue(targetResource, forKey: linkName)
+						} else {
+							// Target resource was not found in store, create a placeholder
+							let placeholderResource = self.classMap[type]() as Resource
+							placeholderResource.resourceID = ID
+							resource.setValue(placeholderResource, forKey: linkName)
+						}
+					}
+
+				} else if resource.persistentAttributes[linkName]!.type == ResourceAttribute.AttributeType.ToMany {
+					var targetResources: [Resource] = []
+
+					// We can only resolve if IDs are known
+					if let IDs = link.IDs {
+
+						for ID in IDs {
+							// Find target of relation in store
+							if let targetResource = store.resource(type, identifier: ID) {
+								targetResources.append(targetResource)
+							} else {
+								// Target resource was not found in store, create a placeholder
+								let placeholderResource = self.classMap[type]() as Resource
+								placeholderResource.resourceID = ID
+								targetResources.append(placeholderResource)
+							}
+
+							resource.setValue(targetResources, forKey: linkName)
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	// MARK: Links
+
+	/**
+	Extracts the top level links from the serialized data.
+
+	Each extracted link is added the associated resources in on the following ways:
+	- If the associated resource already contains a link for the given relation,
+	the existing link is interpolated and merged with data from the top level link.
+	Data on the existing link has precedence over the top level data.
+	- If the ssociated resource does not contain a link for the given relation,
+	the top level link is added to the resource after interpolation.
+	*/
+	private func extractLinks() {
+		if let links = self.data["links"].dictionaryValue {
+
+			// Loop through all links in the serialized data
+			for (linkName, linkData) in links {
+
+				// Explode compound template name
+				let templateNameComponents = linkName.componentsSeparatedByString(".")
+				let templateResourceType = templateNameComponents[0]
+				let templateResourceKey = templateNameComponents[1]
+
+				// Find all resources to which to apply this template
+				for resource in self.store.resourcesWithName(templateResourceType) {
+
+					// Find existing link to augment or create a new link
+					var augmentedLink = resource.links[templateResourceKey] ?? ResourceLink()
+
+					// Assign the interpolated href if a href wasn't specified already
+					if augmentedLink.href == nil {
+
+						// Interpolate URL
+						if let templateHref = linkData["href"].stringValue {
+							var interpolated: NSString = templateHref as NSString
+							interpolated = (interpolated as NSString).stringByReplacingOccurrencesOfString("{\(templateResourceType).id}", withString: resource.resourceID!)
+							interpolated = (interpolated as NSString).stringByReplacingOccurrencesOfString("{\(templateResourceType).\(templateResourceKey)}", withString: augmentedLink.joinedIDs)
+							augmentedLink.href = interpolated
+						}
+					}
+
+					// Assign the type if the type wasn't specified already
+					if augmentedLink.type == nil {
+						augmentedLink.type = linkData["type"].stringValue
+					}
+
+					resource.links[templateResourceKey] = augmentedLink
+				}
+			}
+		}
+	}
+
+
+	// MARK: Meta
+
+	private func extractMeta() {
+		var metaObjects: [String: Meta] = [:]
+
+		if let meta = self.data["meta"].dictionaryValue {
+			for (metaKey, metaData) in meta {
+				let meta = self.classMap["_meta"]() as Meta
+				self.extractAttributes(metaData, intoResource: meta)
+				metaObjects[metaKey] = meta
+			}
+		}
+
+		self.meta = metaObjects
+	}
 }
 
 
@@ -655,243 +655,243 @@ class DeserializeOperation: NSOperation {
 */
 class SerializeOperation: NSOperation {
 
-  private let resources: [Resource]
-  private let formatter = Formatter()
-  private let mode: SerializationMode
+	private let resources: [Resource]
+	private let formatter = Formatter()
+	private let mode: SerializationMode
 
-  var result: [String: AnyObject]?
+	var result: [String: AnyObject]?
 
-  init(resources: [Resource], mode: SerializationMode) {
-    self.resources = resources
-    self.mode = mode
-  }
+	init(resources: [Resource], mode: SerializationMode) {
+		self.resources = resources
+		self.mode = mode
+	}
 
-  override func main() {
-    if self.resources.count == 1 {
-      let resource = self.resources.first!
-      let serializedData = self.serializeResource(resource)
-      self.result = [resource.resourceType: serializedData]
+	override func main() {
+		if self.resources.count == 1 {
+			let resource = self.resources.first!
+			let serializedData = self.serializeResource(resource)
+			self.result = [resource.resourceType: serializedData]
 
-    } else  {
-      var dictionary: [String: [[String: AnyObject]]] = [:]
+		} else  {
+			var dictionary: [String: [[String: AnyObject]]] = [:]
 
-      for resource in resources {
-        var serializedData = self.serializeResource(resource)
+			for resource in resources {
+				var serializedData = self.serializeResource(resource)
 
-        //Add the resource representation to the root dictionary
-        if dictionary[resource.resourceType] == nil {
-          dictionary[resource.resourceType] = [serializedData]
-        } else {
-          dictionary[resource.resourceType]!.append(serializedData)
-        }
-      }
+				//Add the resource representation to the root dictionary
+				if dictionary[resource.resourceType] == nil {
+					dictionary[resource.resourceType] = [serializedData]
+				} else {
+					dictionary[resource.resourceType]!.append(serializedData)
+				}
+			}
 
-      self.result = dictionary
-    }
-  }
+			self.result = dictionary
+		}
+	}
 
-  private func serializeResource(resource: Resource) -> [String: AnyObject] {
-    var serializedData: [String: AnyObject] = [:]
+	private func serializeResource(resource: Resource) -> [String: AnyObject] {
+		var serializedData: [String: AnyObject] = [:]
 
-    // Special attributes
-    if let ID = resource.resourceID {
-      self.addID(&serializedData, ID: ID)
-    }
+		// Special attributes
+		if let ID = resource.resourceID {
+			self.addID(&serializedData, ID: ID)
+		}
 
-    self.addAttributes(&serializedData, resource: resource)
-    self.addRelationships(&serializedData, resource: resource)
+		self.addAttributes(&serializedData, resource: resource)
+		self.addRelationships(&serializedData, resource: resource)
 
-    return serializedData
-  }
-
-
-  // MARK: Special attributes
-
-  /**
-  Adds the given ID to the passed serialized data.
-
-  :param: serializedData The data to add the ID to.
-  :param: ID             The ID to add.
-  */
-  private func addID(inout serializedData: [String: AnyObject], ID: String) {
-    serializedData["id"] = ID
-  }
+		return serializedData
+	}
 
 
-  // MARK: Attributes
+	// MARK: Special attributes
 
-  /**
-  Adds the attributes of the the given resource to the passed serialized data.
+	/**
+	Adds the given ID to the passed serialized data.
 
-  This method loops over all the attributes in the passed resource, maps the attribute name
-  to the key for the serialized form and formats the value of the attribute. It then passes
-  the key and value to the addAttribute method.
-
-  :param: serializedData The data to add the attributes to.
-  :param: resource       The resource whose attributes to add.
-  */
-  private func addAttributes(inout serializedData: [String: AnyObject], resource: Resource) {
-    for (attributeName, attribute) in resource.persistentAttributes {
-      if attribute.isRelationship() {
-        continue
-      }
-
-      if self.mode == .DirtyAttributes && !resource.isDirty(attributeName) {
-        // Attribute is not dirty, skip serialization.
-        continue
-      }
-
-      let key = attribute.representationName ?? attributeName
-
-      if let unformattedValue: AnyObject = resource.valueForKey(attributeName) {
-        self.addAttribute(&serializedData, key: key, value: self.formatter.serialize(unformattedValue, ofType: attribute.type))
-      } else {
-        self.addAttribute(&serializedData, key: key, value: NSNull())
-      }
-    }
-  }
-
-  /**
-  Adds the given key/value pair to the passed serialized data.
-
-  :param: serializedData The data to add the key/value pair to.
-  :param: key            The key to add to the serialized data.
-  :param: value          The value to add to the serialized data.
-  */
-  private func addAttribute(inout serializedData: [String: AnyObject], key: String, value: AnyObject) {
-    serializedData[key] = value
-  }
+	:param: serializedData The data to add the ID to.
+	:param: ID             The ID to add.
+	*/
+	private func addID(inout serializedData: [String: AnyObject], ID: String) {
+		serializedData["id"] = ID
+	}
 
 
-  // MARK: Relationships
+	// MARK: Attributes
 
-  /**
-  Adds the relationships of the the given resource to the passed serialized data.
+	/**
+	Adds the attributes of the the given resource to the passed serialized data.
 
-  This method loops over all the relationships in the passed resource, maps the attribute name
-  to the key for the serialized form and gets the related attributes It then passes the key and
-  related resources to either the addToOneRelationship or addToManyRelationship method.
+	This method loops over all the attributes in the passed resource, maps the attribute name
+	to the key for the serialized form and formats the value of the attribute. It then passes
+	the key and value to the addAttribute method.
+
+	:param: serializedData The data to add the attributes to.
+	:param: resource       The resource whose attributes to add.
+	*/
+	private func addAttributes(inout serializedData: [String: AnyObject], resource: Resource) {
+		for (attributeName, attribute) in resource.persistentAttributes {
+			if attribute.isRelationship() {
+				continue
+			}
+
+			if self.mode == .DirtyAttributes && !resource.isDirty(attributeName) {
+				// Attribute is not dirty, skip serialization.
+				continue
+			}
+
+			let key = attribute.representationName ?? attributeName
+
+			if let unformattedValue: AnyObject = resource.valueForKey(attributeName) {
+				self.addAttribute(&serializedData, key: key, value: self.formatter.serialize(unformattedValue, ofType: attribute.type))
+			} else {
+				self.addAttribute(&serializedData, key: key, value: NSNull())
+			}
+		}
+	}
+
+	/**
+	Adds the given key/value pair to the passed serialized data.
+
+	:param: serializedData The data to add the key/value pair to.
+	:param: key            The key to add to the serialized data.
+	:param: value          The value to add to the serialized data.
+	*/
+	private func addAttribute(inout serializedData: [String: AnyObject], key: String, value: AnyObject) {
+		serializedData[key] = value
+	}
 
 
-  :param: serializedData The data to add the relationships to.
-  :param: resource       The resource whose relationships to add.
-  */
-  private func addRelationships(inout serializedData: [String: AnyObject], resource: Resource) {
-    for (attributeName, attribute) in resource.persistentAttributes {
-      if !attribute.isRelationship() {
-        continue
-      }
+	// MARK: Relationships
 
-      let key = attribute.representationName ?? attributeName
+	/**
+	Adds the relationships of the the given resource to the passed serialized data.
 
-      switch attribute.type {
-      case .ToOne:
-        self.addToOneRelationship(&serializedData, key: key, relatedResource: resource.valueForKey(attributeName) as? Resource)
-      case .ToMany:
-        self.addToManyRelationship(&serializedData, key: key, relatedResources: resource.valueForKey(attributeName) as? [Resource])
-      default: ()
-      }
-    }
-  }
+	This method loops over all the relationships in the passed resource, maps the attribute name
+	to the key for the serialized form and gets the related attributes It then passes the key and
+	related resources to either the addToOneRelationship or addToManyRelationship method.
 
-  /**
-  Adds the given resource as a to to-one relationship to the serialized data.
 
-  :param: serializedData  The data to add the related resource to.
-  :param: key             The key to add to the serialized data.
-  :param: relatedResource The related resource to add to the serialized data.
-  */
-  private func addToOneRelationship(inout serializedData: [String: AnyObject], key: String, relatedResource: Resource?) {
-    var linkData: AnyObject
+	:param: serializedData The data to add the relationships to.
+	:param: resource       The resource whose relationships to add.
+	*/
+	private func addRelationships(inout serializedData: [String: AnyObject], resource: Resource) {
+		for (attributeName, attribute) in resource.persistentAttributes {
+			if !attribute.isRelationship() {
+				continue
+			}
 
-    if let ID = relatedResource?.resourceID {
-      linkData = ID
-    } else {
-      linkData = NSNull()
-    }
+			let key = attribute.representationName ?? attributeName
 
-    if serializedData["links"] == nil {
-      serializedData["links"] = [key: linkData]
-    } else {
-      var links: [String: AnyObject] = serializedData["links"]! as [String: AnyObject]
-      links[key] = linkData
-      serializedData["links"] = links
-    }
-  }
+			switch attribute.type {
+			case .ToOne:
+				self.addToOneRelationship(&serializedData, key: key, relatedResource: resource.valueForKey(attributeName) as? Resource)
+			case .ToMany:
+				self.addToManyRelationship(&serializedData, key: key, relatedResources: resource.valueForKey(attributeName) as? [Resource])
+			default: ()
+			}
+		}
+	}
 
-  /**
-  Adds the given resources as a to to-many relationship to the serialized data.
+	/**
+	Adds the given resource as a to to-one relationship to the serialized data.
 
-  :param: serializedData   The data to add the related resources to.
-  :param: key              The key to add to the serialized data.
-  :param: relatedResources The related resources to add to the serialized data.
-  */
-  private func addToManyRelationship(inout serializedData: [String: AnyObject], key: String, relatedResources: [Resource]?) {
-    var linkData: AnyObject
-    
-    if let resources = relatedResources {
-      let IDs: [String] = resources.filter { resource in
-        return resource.resourceID != nil
-        }.map { resource in
-          return resource.resourceID!
-      }
-      
-      linkData = IDs
-      
-    } else {
-      linkData = []
-    }
-    
-    if serializedData["links"] == nil {
-      serializedData["links"] = [key: linkData]
-    } else {
-      var links: [String: AnyObject] = serializedData["links"]! as [String: AnyObject]
-      links[key] = linkData
-      serializedData["links"] = links
-    }
-  }
+	:param: serializedData  The data to add the related resource to.
+	:param: key             The key to add to the serialized data.
+	:param: relatedResource The related resource to add to the serialized data.
+	*/
+	private func addToOneRelationship(inout serializedData: [String: AnyObject], key: String, relatedResource: Resource?) {
+		var linkData: AnyObject
+
+		if let ID = relatedResource?.resourceID {
+			linkData = ID
+		} else {
+			linkData = NSNull()
+		}
+
+		if serializedData["links"] == nil {
+			serializedData["links"] = [key: linkData]
+		} else {
+			var links: [String: AnyObject] = serializedData["links"]! as [String: AnyObject]
+			links[key] = linkData
+			serializedData["links"] = links
+		}
+	}
+
+	/**
+	Adds the given resources as a to to-many relationship to the serialized data.
+
+	:param: serializedData   The data to add the related resources to.
+	:param: key              The key to add to the serialized data.
+	:param: relatedResources The related resources to add to the serialized data.
+	*/
+	private func addToManyRelationship(inout serializedData: [String: AnyObject], key: String, relatedResources: [Resource]?) {
+		var linkData: AnyObject
+
+		if let resources = relatedResources {
+			let IDs: [String] = resources.filter { resource in
+				return resource.resourceID != nil
+				}.map { resource in
+					return resource.resourceID!
+			}
+
+			linkData = IDs
+
+		} else {
+			linkData = []
+		}
+
+		if serializedData["links"] == nil {
+			serializedData["links"] = [key: linkData]
+		} else {
+			var links: [String: AnyObject] = serializedData["links"]! as [String: AnyObject]
+			links[key] = linkData
+			serializedData["links"] = links
+		}
+	}
 }
 
 
 // MARK:
 
 class Formatter {
-  
-  private func deserialize(value: AnyObject, ofType type: ResourceAttribute.AttributeType) -> AnyObject {
-    switch type {
-    case .Date:
-      return self.deserializeDate(value as String)
-    default:
-      return value
-    }
-  }
-  
-  private func serialize(value: AnyObject, ofType type: ResourceAttribute.AttributeType) -> AnyObject {
-    switch type {
-    case .Date:
-      return self.serializeDate(value as NSDate)
-    default:
-      return value
-    }
-  }
-  
-  // MARK: Date
-  
-  private lazy var dateFormatter: NSDateFormatter = {
-    let formatter = NSDateFormatter()
-    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-    return formatter
-    }()
-  
-  private func serializeDate(date: NSDate) -> String {
-    return self.dateFormatter.stringFromDate(date)
-  }
-  
-  private func deserializeDate(value: String) -> NSDate {
-    if let date = self.dateFormatter.dateFromString(value) {
-      return date
-    }
-    
-    return NSDate()
-  }
+
+	private func deserialize(value: AnyObject, ofType type: ResourceAttribute.AttributeType) -> AnyObject {
+		switch type {
+		case .Date:
+			return self.deserializeDate(value as String)
+		default:
+			return value
+		}
+	}
+
+	private func serialize(value: AnyObject, ofType type: ResourceAttribute.AttributeType) -> AnyObject {
+		switch type {
+		case .Date:
+			return self.serializeDate(value as NSDate)
+		default:
+			return value
+		}
+	}
+
+	// MARK: Date
+
+	private lazy var dateFormatter: NSDateFormatter = {
+		let formatter = NSDateFormatter()
+		formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+		return formatter
+		}()
+
+	private func serializeDate(date: NSDate) -> String {
+		return self.dateFormatter.stringFromDate(date)
+	}
+
+	private func deserializeDate(value: String) -> NSDate {
+		if let date = self.dateFormatter.dateFromString(value) {
+			return date
+		}
+
+		return NSDate()
+	}
 }

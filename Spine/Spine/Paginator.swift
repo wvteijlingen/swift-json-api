@@ -18,11 +18,11 @@ import BrightFutures
 }
 
 public class Paginator {
-	
+
 	private var spine: Spine
 	private var query: Query
 	private var paginationData: Paginatable?
-	
+
 	/// The current page.
 	public var currentPage: Int {
 		get {
@@ -38,96 +38,96 @@ public class Paginator {
 			query.page = newValue
 		}
 	}
-	
+
 	/// The amount of items per page.
 	/// You must configure this in the query, it cannot be changed afterwards.
 	public var pageSize: Int? {
 		return _pageSize
 	}
 	private var _pageSize: Int?
-	
-	
+
+
 	/// Returns whether the next page can be fetched.
 	public var canFetchNextPage: Bool {
 		if let paginationData = self.paginationData {
 			return paginationData.currentPage < paginationData.lastPage
-		}
-			
-		return true
+			}
+
+			return true
 	}
-	
+
 	/// Returns whether the previous page can be fetched.
 	public var canFetchPreviousPage: Bool {
 		if let paginationData = self.paginationData {
 			return paginationData.currentPage > paginationData.firstPage
-		}
-			
-		return false
+			}
+
+			return false
 	}
-	
-	
+
+
 	/// The cumulative fetched resources
 	public var fetchedResources : [Resource] = []
-	
-	
+
+
 	public init(query: Query) {
 		self.spine = Spine.sharedInstance
 		self.query = query
 		self._pageSize = query.pageSize
 	}
-	
+
 	public init(spine: Spine, query: Query) {
 		self.spine = spine
 		self.query = query
 	}
-	
+
 	/**
 	Fetches the next page.
 	You must make sure the next page can be fetched using `canFetchNextPage`.
-	
+
 	:returns: A future containing the new resources fetched and optional meta.
 	*/
 	public func fetchNextPage() -> Future<([Resource], Meta?)> {
 		assert(self.canFetchNextPage, "Cannot fetch the next page.")
-		
+
 		if self.paginationData != nil {
 			self.currentPage += 1
 		}
-		
+
 		return self.performFetch()
 	}
-	
+
 	/**
 	Fetches the previous page.
 	You must make sure the previous page can be fetched using `canFetchPreviousPage`.
-	
+
 	:returns: A future containing the new resources fetched and optional meta.
 	*/
 	public func fetchPreviousPage() -> Future<([Resource], Meta?)> {
 		assert(self.canFetchPreviousPage, "Cannot fetch the previous page.")
-		
+
 		if self.paginationData != nil {
 			self.currentPage -= 1
 		}
-		
+
 		return self.performFetch()
 	}
-	
-	
+
+
 	private func performFetch() -> Future<([Resource], Meta?)> {
 		let promise = Promise<([Resource], Meta?)>()
-		
+
 		self.spine.fetchResourcesForQuery(self.query).onSuccess { resources, meta in
 			assert(meta != nil, "No meta recieved. Paginator requires pagination data to be present in a meta section.")
 			assert(meta!.conformsToProtocol(Paginatable), "The registered meta class does not conform to the Paginatable protocol.")
 			self.paginationData = (meta as Paginatable)
-			
+
 			self.fetchedResources += resources
 			promise.success(resources, meta)
 			}.onFailure { error in
 				promise.error(error)
 		}
-		
+
 		return promise.future
 	}
 }
