@@ -46,13 +46,23 @@ class SerializingTests: SerializerTests {
 	func testSerializeSingleResourceAttributes() {
 		let json = serializedJSONWithOptions(SerializationOptions())
 		
+		var dateString = json["data"]["attributes"]["dateAttribute"].stringValue
+
+		var dateFormatter = NSDateFormatter()
+		let timeZone = NSTimeZone(name: "UTC")
+		dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+		dateFormatter.timeZone = timeZone
+		println(dateString)
+		var date = dateFormatter.dateFromString(dateString)
+		dateString = dateFormatter.stringFromDate(date!)
+
 		XCTAssertEqual(json["data"]["id"].stringValue, foo.id!, "Serialized id is not equal.")
 		XCTAssertEqual(json["data"]["type"].stringValue, foo.type, "Serialized type is not equal.")
 		XCTAssertEqual(json["data"]["attributes"]["integerAttribute"].intValue, foo.integerAttribute!, "Serialized integer is not equal.")
 		XCTAssertEqual(json["data"]["attributes"]["floatAttribute"].floatValue, foo.floatAttribute!, "Serialized float is not equal.")
 		XCTAssertTrue(json["data"]["attributes"]["booleanAttribute"].boolValue, "Serialized boolean is not equal.")
 		XCTAssertNotNil(json["data"]["attributes"]["nilAttribute"].null, "Serialized nil is not equal.")
-		XCTAssertEqual(json["data"]["attributes"]["dateAttribute"].stringValue, "1970-01-01T01:00:00+01:00", "Serialized date is not equal.")
+		XCTAssertEqual(dateString, "1970-01-01T00:00:00Z", "Serialized date is not equal.")
 	}
 	
 	func testSerializeSingleResourceToOneRelationships() {
