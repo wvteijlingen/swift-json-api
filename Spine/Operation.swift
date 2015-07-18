@@ -211,12 +211,14 @@ class SaveOperation: Operation {
 		Spine.logInfo(.Spine, "Saving resource \(resource) using URL: \(request.URL)")
 		
 		HTTPClient.request(request.method, URL: request.URL, payload: request.payload) { statusCode, responseData, networkError in
-			if let networkError = networkError {
-				self.result = Failable(networkError)
-				self.state = .Finished
-				return
-			}
-			
+
+            if 400 ... 599 ~= statusCode! {
+                let error = NSError(domain: "networkError", code: statusCode!, userInfo: nil)
+                self.result = Failable(error)
+                self.state = .Finished
+                return
+            }
+
 			// Map the response back onto the resource
 			if let data = responseData {
 				self.serializer.deserializeData(data, mappingTargets: [self.resource])
