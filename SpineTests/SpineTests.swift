@@ -367,6 +367,30 @@ class PersistingTests: SpineTests {
 	// MARK: Save
 	
 	//TODO
+
+    func testCreateResourceWithAPIError() {
+
+        HTTPClient.handler = { (request: NSURLRequest, payload: NSData?) -> (responseData: NSData, statusCode: Int, error: NSError?) in
+            XCTAssertEqual(request.URL!, NSURL(string:"http://example.com/foos")!, "Request URL not as expected.")
+            XCTAssertEqual(request.HTTPMethod!, "POST", "Expected HTTP method to be 'POST'.")
+            var responseData = "{}".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
+            return (responseData: responseData!, statusCode: 400, error: nil)
+        }
+
+        let foo = Foo()
+        let expectation = expectationWithDescription("testCreateResource")
+
+        spine.save(foo).onSuccess { _ in
+            expectation.fulfill()
+            XCTFail("A 400 error code should not be considered successful.")
+            }.onFailure { error in
+                expectation.fulfill()
+        }
+
+        waitForExpectationsWithTimeout(10) { error in
+            XCTAssertNil(error, "\(error)")
+        }
+    }
 }
 
 
