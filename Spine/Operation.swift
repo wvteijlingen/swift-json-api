@@ -211,32 +211,44 @@ class SaveOperation: Operation {
 		Spine.logInfo(.Spine, "Saving resource \(resource) using URL: \(request.URL)")
 		
 		HTTPClient.request(request.method, URL: request.URL, payload: request.payload) { statusCode, responseData, networkError in
-			if let networkError = networkError {
-				self.result = Failable(networkError)
-				self.state = .Finished
-				return
-			}
-			
-			// Map the response back onto the resource
-			if let data = responseData {
-				self.serializer.deserializeData(data, mappingTargets: [self.resource])
-			}
-			
-			// Separately update relationships if this is an existing resource
-			if self.isNewResource {
-				self.result = Failable()
-				self.state = .Finished
-				return
-			} else {
-				let relationshipOperation = RelationshipOperation(resource: self.resource)
-				
-				relationshipOperation.completionBlock = {
-					if let error = relationshipOperation.result?.error {
-						self.result = Failable(error)
+
+			if let statusCode = statusCode {
+				if 200 ... 399 ~= statusCode {
+					// Map the response back onto the resource
+					if let data = responseData {
+						self.serializer.deserializeData(data, mappingTargets: [self.resource])
 					}
-					
+
+					// Separately update relationships if this is an existing resource
+					if self.isNewResource {
+						self.result = Failable()
+						self.state = .Finished
+						return
+					} else {
+						let relationshipOperation = RelationshipOperation(resource: self.resource)
+						relationshipOperation.spine = self.spine
+
+						relationshipOperation.completionBlock = {
+							if let error = relationshipOperation.result?.error {
+								self.result = Failable(error)
+							}
+
+							self.state = .Finished
+						}
+
+						relationshipOperation.execute()
+					}
+				} else {
+					let error = NSError(domain: "networkError", code: statusCode, userInfo: nil)
+					self.result = Failable(error)
 					self.state = .Finished
+					return
+
 				}
+			} else {
+				self.result = Failable(networkError!)
+				self.state = .Finished
+				return
 			}
 		}
 	}
