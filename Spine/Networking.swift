@@ -84,7 +84,7 @@ public class URLSessionClient: _HTTPClientProtocol {
 	private func performRequest(request: NSURLRequest, callback: HTTPClientCallback) {
 		let task = urlSession.dataTaskWithRequest(request) { data, response, error in
 			let response = (response as? NSHTTPURLResponse)
-			
+
 			// Network error
 			if let error = error {
 				Spine.logError(.Networking, "\(request.URL) - \(error.localizedDescription)")
