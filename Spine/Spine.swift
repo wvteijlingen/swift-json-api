@@ -400,7 +400,7 @@ func enumerateFields<T: Field>(resource: ResourceProtocol, type: T.Type, callbac
 }
 
 func enumerateFields<T: ResourceProtocol>(resource: T, callback: (Field) -> ()) {
-	for field in resource.dynamicType.fields {
+	for field in (resource as! Resource).dynamicType.fields {
 		callback(field)
 	}
 }
