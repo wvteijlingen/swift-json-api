@@ -326,6 +326,9 @@ class SaveOperation: ConcurrentOperation {
 			if let error = result.error {
 				self.relationshipOperationQueue.cancelAllOperations()
 				self.result = Failable(error)
+			} else {
+				self.result = Failable.Success()
+				self.state = .Finished
 			}
 		}
 		
@@ -345,6 +348,8 @@ class SaveOperation: ConcurrentOperation {
 				removeOperation.completionBlock = { [unowned removeOperation] in completionHandler(result: removeOperation.result!) }
 				relationshipOperationQueue.addOperation(removeOperation)
 			default: ()
+				self.result = Failable.Success()
+				self.state = .Finished
 			}
 		}
 	}
