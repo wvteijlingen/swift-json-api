@@ -208,15 +208,19 @@ class DeserializeOperation: NSOperation {
 	}
 	
 	/**
-	Extracts the value for the given key from the passed serialized data.
+	Extracts the value for the given key path from the passed serialized data.
 	
 	- parameter serializedData: The data from which to extract the attribute.
-	- parameter key:            The key for which to extract the value from the data.
+	- parameter key:            The key path for which to extract the value from the data.
 	
-	- returns: The extracted value or nil if no attribute with the given key was found in the data.
+	- returns: The extracted value or nil if no attribute with the given key path was found in the data.
 	*/
-	private func extractAttribute(serializedData: JSON, key: String) -> AnyObject? {
-		let value = serializedData["attributes"][key]
+    private func extractAttribute(serializedData: JSON, key: String) -> AnyObject? {
+        let parts = key.componentsSeparatedByString(".")
+        var value = serializedData["attributes"]
+        for part in parts {
+            value = value[part]
+        }
 		
 		if let _ = value.null {
 			return nil
