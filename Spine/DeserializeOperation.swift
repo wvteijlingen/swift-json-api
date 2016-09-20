@@ -175,7 +175,7 @@ class DeserializeOperation: Operation {
 		
 		// Extract data
 		resource.id = id
-		resource.url = representation["links"]["self"].URL
+		resource.url = representation["links"]["self"].URL as URL?
 		resource.meta = representation["meta"].dictionaryObject
 		extractAttributes(representation, intoResource: resource)
 		extractRelationships(representation, intoResource: resource)
@@ -294,7 +294,7 @@ class DeserializeOperation: Operation {
 			}
 			
 			if let resourceURL = linkData["links"]?["related"].URL {
-				resource!.url = resourceURL
+				resource!.url = resourceURL as URL
 			}
 		}
 		
@@ -315,8 +315,8 @@ class DeserializeOperation: Operation {
 		var resourceCollection: LinkedResourceCollection? = nil
 
 		if let linkData = serializedData["relationships"][key].dictionary {
-			let resourcesURL: URL? = linkData["links"]?["related"].URL
-			let linkURL: URL? = linkData["links"]?["self"].URL
+			let resourcesURL: URL? = linkData["links"]?["related"].URL as URL?
+			let linkURL: URL? = linkData["links"]?["self"].URL as URL?
 			
 			if let linkage = linkData["data"]?.array {
 				let mappedLinkage = linkage.map { ResourceIdentifier(type: $0["type"].stringValue, id: $0["id"].stringValue) }
@@ -344,7 +344,7 @@ class DeserializeOperation: Operation {
 			data = nil
 		}
 		
-		return RelationshipData(selfURL: selfURL, relatedURL: relatedURL, data: data)
+		return RelationshipData(selfURL: selfURL as URL?, relatedURL: relatedURL as URL?, data: data)
 	}
 	
 	/**
