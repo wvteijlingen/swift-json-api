@@ -145,7 +145,7 @@ private struct URLValueFormatter: ValueFormatter {
 	}
 	
 	func format(value: NSURL, attribute: URLAttribute) -> AnyObject {
-		return value.absoluteString
+		return value.absoluteString ?? ""
 	}
 }
 
