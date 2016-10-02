@@ -66,7 +66,7 @@ public class JSONAPIRouter: Router {
 	public init() { }
 	
 	public func URLForResourceType(type: ResourceType) -> NSURL {
-		return baseURL.URLByAppendingPathComponent(type)
+		return baseURL.URLByAppendingPathComponent(type)!
 	}
 	
 	public func URLForRelationship<T: Resource>(relationship: Relationship, ofResource resource: T) -> NSURL {
@@ -76,8 +76,8 @@ public class JSONAPIRouter: Router {
 		
 		let resourceURL = resource.URL ?? URLForResourceType(resource.resourceType).URLByAppendingPathComponent("/\(resource.id!)")
 		let key = keyFormatter.format(relationship)
-		let urlString = resourceURL.URLByAppendingPathComponent("/relationships/\(key)").absoluteString
-		return NSURL(string: urlString, relativeToURL: baseURL)
+		let urlString = resourceURL!.URLByAppendingPathComponent("/relationships/\(key)")!.absoluteString
+		return NSURL(string: urlString!, relativeToURL: baseURL)!
 	}
 
 	
@@ -137,9 +137,9 @@ public class JSONAPIRouter: Router {
 			let fieldName = filter.leftExpression.keyPath
             var item: NSURLQueryItem?
             if let field = T.fieldNamed(fieldName) {
-                item = queryItemForFilter(field, value: filter.rightExpression.constantValue, operatorType: filter.predicateOperatorType)
+                item = queryItemForFilter(field, value: filter.rightExpression.constantValue!, operatorType: filter.predicateOperatorType)
             } else {
-                item = queryItemForFilterName(fieldName, value: filter.rightExpression.constantValue, operatorType: filter.predicateOperatorType)
+                item = queryItemForFilterName(fieldName, value: filter.rightExpression.constantValue!, operatorType: filter.predicateOperatorType)
             }
 			setQueryItem(item!, forQueryItems: &queryItems)
 		}
