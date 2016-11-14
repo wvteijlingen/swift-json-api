@@ -264,6 +264,22 @@ public struct Query<T: Resource> {
 			assertionFailure("Cannot add order on field \(fieldName) of resource \(T.resourceType). No such field has been configured.")
 		}
 	}
+
+    /// Sort in ascending order by the the given attribute. Previously added field take precedence over this field.
+    /// Won't check the presence of a field with this name.
+    ///
+    /// - parameter fieldName: The name of the field which to order by.
+    public mutating func addCustomAscendingOrder(_ attribute: String) {
+        sortDescriptors.append(NSSortDescriptor(key: attribute, ascending: true))
+    }
+
+    /// Sort in descending order by the the given attribute. Previously added field take precedence over this property.
+    /// Won't check the presence of a field with this name.
+    ///
+    /// - parameter property: The name of the field which to order by.
+    public mutating func addCustomDescendingOrder(_ attribute: String) {
+        sortDescriptors.append(NSSortDescriptor(key: attribute, ascending: false))
+    }
 	
 	
 	// MARK: Pagination
