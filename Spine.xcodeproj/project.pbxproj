@@ -73,7 +73,7 @@
 		CFFF61041DD47B3A0065FDFF /* Resource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60CE1DD470BA0065FDFF /* Resource.swift */; };
 		CFFF61051DD47B3A0065FDFF /* ResourceCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60CF1DD470BA0065FDFF /* ResourceCollection.swift */; };
 		CFFF61061DD47B3A0065FDFF /* ResourceField.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D01DD470BA0065FDFF /* ResourceField.swift */; };
-		CFFF61071DD47B3E0065FDFF /* Spine.h in Headers */ = {isa = PBXBuildFile; fileRef = CFFF60DA1DD470CD0065FDFF /* Spine.h */; };
+		CFFF61071DD47B3E0065FDFF /* Spine.h in Headers */ = {isa = PBXBuildFile; fileRef = CFFF60DA1DD470CD0065FDFF /* Spine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFFF61081DD47B3E0065FDFF /* Spine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60DB1DD470CD0065FDFF /* Spine.swift */; };
 		CFFF61091DD47B3E0065FDFF /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D81DD470CD0065FDFF /* Query.swift */; };
 		CFFF610A1DD47B3E0065FDFF /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D71DD470CD0065FDFF /* Operation.swift */; };
@@ -81,7 +81,7 @@
 		CFFF610C1DD47B3E0065FDFF /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D91DD470CD0065FDFF /* Routing.swift */; };
 		CFFF610D1DD47B3E0065FDFF /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D51DD470CD0065FDFF /* Logging.swift */; };
 		CFFF610E1DD47B3E0065FDFF /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D41DD470CD0065FDFF /* Errors.swift */; };
-		CFFF610F1DD47B3F0065FDFF /* Spine.h in Headers */ = {isa = PBXBuildFile; fileRef = CFFF60DA1DD470CD0065FDFF /* Spine.h */; };
+		CFFF610F1DD47B3F0065FDFF /* Spine.h in Headers */ = {isa = PBXBuildFile; fileRef = CFFF60DA1DD470CD0065FDFF /* Spine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFFF61101DD47B3F0065FDFF /* Spine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60DB1DD470CD0065FDFF /* Spine.swift */; };
 		CFFF61111DD47B3F0065FDFF /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D81DD470CD0065FDFF /* Query.swift */; };
 		CFFF61121DD47B3F0065FDFF /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D71DD470CD0065FDFF /* Operation.swift */; };
@@ -89,7 +89,7 @@
 		CFFF61141DD47B3F0065FDFF /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D91DD470CD0065FDFF /* Routing.swift */; };
 		CFFF61151DD47B3F0065FDFF /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D51DD470CD0065FDFF /* Logging.swift */; };
 		CFFF61161DD47B3F0065FDFF /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D41DD470CD0065FDFF /* Errors.swift */; };
-		CFFF61171DD47B400065FDFF /* Spine.h in Headers */ = {isa = PBXBuildFile; fileRef = CFFF60DA1DD470CD0065FDFF /* Spine.h */; };
+		CFFF61171DD47B400065FDFF /* Spine.h in Headers */ = {isa = PBXBuildFile; fileRef = CFFF60DA1DD470CD0065FDFF /* Spine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFFF61181DD47B400065FDFF /* Spine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60DB1DD470CD0065FDFF /* Spine.swift */; };
 		CFFF61191DD47B400065FDFF /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D81DD470CD0065FDFF /* Query.swift */; };
 		CFFF611A1DD47B400065FDFF /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D71DD470CD0065FDFF /* Operation.swift */; };
@@ -97,7 +97,7 @@
 		CFFF611C1DD47B400065FDFF /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D91DD470CD0065FDFF /* Routing.swift */; };
 		CFFF611D1DD47B400065FDFF /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D51DD470CD0065FDFF /* Logging.swift */; };
 		CFFF611E1DD47B400065FDFF /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D41DD470CD0065FDFF /* Errors.swift */; };
-		CFFF61C61DDB1C840065FDFF /* Spine.h in Headers */ = {isa = PBXBuildFile; fileRef = CFFF60DA1DD470CD0065FDFF /* Spine.h */; };
+		CFFF61C61DDB1C840065FDFF /* Spine.h in Headers */ = {isa = PBXBuildFile; fileRef = CFFF60DA1DD470CD0065FDFF /* Spine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFFF61C71DDB1C890065FDFF /* Spine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60DB1DD470CD0065FDFF /* Spine.swift */; };
 		CFFF61C81DDB1C890065FDFF /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D81DD470CD0065FDFF /* Query.swift */; };
 		CFFF61C91DDB1C890065FDFF /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF60D71DD470CD0065FDFF /* Operation.swift */; };
