@@ -29,11 +29,11 @@ struct ResourceFactory {
 	/// - throws: A SerializerError.resourceTypeUnregistered erro when the type is not registered.
 	///
 	/// - returns: An instantiated resource.
-	func instantiate(_ type: ResourceType) throws -> Resource {
-		if resourceTypes[type] == nil {
+    func instantiate(_ type: ResourceType) throws -> Resource {
+		guard let resourceType = resourceTypes[type] else {
 			throw SerializerError.resourceTypeUnregistered(type)
 		}
-		return resourceTypes[type]!.init()
+		return resourceType.init()
 	}
 
 	
@@ -52,7 +52,7 @@ struct ResourceFactory {
 	///
 	/// - returns: A resource with the given type and id.
 	func dispense(_ type: ResourceType, id: String, pool: inout [Resource], index: Int? = nil) throws -> Resource {
-		var resource: Resource! = pool.filter { $0.resourceType == type && $0.id == id }.first
+        var resource: Resource! = pool.filter { $0.resourceType == type && $0.id == id }.first
 		
 		if resource == nil && index != nil && !pool.isEmpty {
 			let applicableResources = pool.filter { $0.resourceType == type }

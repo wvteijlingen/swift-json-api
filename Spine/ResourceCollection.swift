@@ -170,7 +170,7 @@ public class LinkedResourceCollection: ResourceCollection {
 	/// Link `resource` to the parent resource by appending it to the collection.
 	/// This marks the resource as newly linked. The relationship will be persisted when
 	/// the parent resource is saved.
-	public func linkResource(_ resource: Resource) {
+    public func linkResource(_ resource: Resource) {
 		assert(resource.id != nil, "Cannot link resource that hasn't been persisted yet.")
 		
 		resources.append(resource)
@@ -200,7 +200,7 @@ public class LinkedResourceCollection: ResourceCollection {
 	/// Link `resources` to the parent resource by appending them to the collection.
 	/// This marks the resources as newly linked. The relationship will be persisted when
 	/// the parent resource is saved.
-	public func linkResources(_ resources: [Resource]) {
+    public func linkResources(_ resources: [Resource]) {
 		for resource in resources {
 			linkResource(resource)
 		}

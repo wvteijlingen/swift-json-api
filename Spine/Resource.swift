@@ -42,7 +42,7 @@ public func ==(lhs: ResourceIdentifier, rhs: ResourceIdentifier) -> Bool {
 }
 
 /// A RelationshipData struct holds data about a relationship.
-struct RelationshipData {
+public struct RelationshipData {
 	var selfURL: URL?
 	var relatedURL: URL?
 	var data: [ResourceIdentifier]?
@@ -79,36 +79,69 @@ struct RelationshipData {
 
 /// A base recource class that provides some defaults for resources.
 /// You can create custom resource classes by subclassing from Resource.
-open class Resource: NSObject, NSCoding {
+public protocol Resource: NSCoding, NSObjectProtocol, Equatable {
 	/// The resource type in plural form.
-	open class var resourceType: ResourceType {
-		fatalError("Override resourceType in a subclass.")
-	}
+    static var resourceType: ResourceType { get }
+//	open class var resourceType: ResourceType {
+//		fatalError("Override resourceType in a subclass.")
+//	}
 
 	/// All fields that must be persisted in the API.
-	open class var fields: [Field] { return [] }
+	static var fields: [Field] { get }
 	
 	/// The ID of this resource.
-	public var id: String?
+    var id: String? { get set } // and set?
 	
 	/// The canonical URL of the resource.
-	public var url: URL?
+    var url: URL? { get set }
 	
 	/// Whether the fields of the resource are loaded.
-	public var isLoaded: Bool = false
+    var isLoaded: Bool { get set }
 	
 	/// The metadata for this resource.
-	public var meta: [String: Any]?
+    var meta: [String: Any]? { get set }
 	
 	/// Raw relationship data keyed by relationship name.
-	var relationships: [String: RelationshipData] = [:]
-	
-	public required override init() {
-		super.init()
-	}
-	
-	public required init(coder: NSCoder) {
-		super.init()
+    var relationships: [String: RelationshipData] { get set }
+
+    var description: String { get }
+    var debugDescription: String { get }
+
+
+    /// Returns the value for the field named `field`.
+    func value(forField field: String) -> Any?
+
+    /// Sets the value for the field named `field` to `value`.
+    func setValue(_ value: Any?, forField field: String)
+
+    /// Set the values for all fields to nil and sets `isLoaded` to false.
+    func unload()
+
+    /// Returns the field named `name`, or nil if no such field exists.
+    static func field(named name: String) -> Field?
+}
+
+extension Resource where Self: NSObject {
+//    static var fields: [Field] {
+//        return []
+//    }
+
+    var isLoaded: Bool {
+        return false
+    }
+
+    var relationships: [String: RelationshipData] {
+        return [:]
+    }
+
+	public init() {
+        // XXX: check this for recursion
+        self.init()
+    }
+
+	public init(coder: NSCoder) {
+//		super.init()
+        self.init()
 		self.id = coder.decodeObject(forKey: "id") as? String
 		self.url = coder.decodeObject(forKey: "url") as? URL
 		self.isLoaded = coder.decodeBool(forKey: "isLoaded")
@@ -121,8 +154,8 @@ open class Resource: NSObject, NSCoding {
 			}
 		}
 	}
-	
-	open func encode(with coder: NSCoder) {
+
+	public func encode(with coder: NSCoder) {
 		coder.encode(id, forKey: "id")
 		coder.encode(url, forKey: "url")
 		coder.encode(isLoaded, forKey: "isLoaded")
@@ -135,7 +168,7 @@ open class Resource: NSObject, NSCoding {
 		coder.encode(relationshipsData, forKey: "relationships")
 	}
 
-  /// Returns the value for the field named `field`.
+    /// Returns the value for the field named `field`.
 	func value(forField field: String) -> Any? {
 		return value(forKey: field) as AnyObject?
 	}
@@ -147,7 +180,7 @@ open class Resource: NSObject, NSCoding {
 
 	/// Set the values for all fields to nil and sets `isLoaded` to false.
 	public func unload() {
-		for field in fields {
+        for field in Self.fields {
 			setValue(nil, forField: field.name)
 		}
 		
@@ -155,27 +188,27 @@ open class Resource: NSObject, NSCoding {
 	}
 	
 	/// Returns the field named `name`, or nil if no such field exists.
-	class func field(named name: String) -> Field? {
+	static func field(named name: String) -> Field? {
 		return fields.filter { $0.name == name }.first
 	}
 }
 
 extension Resource {
-	override open var description: String {
-		return "\(resourceType)(\(id), \(url))"
+	var description: String {
+		return "\(Self.resourceType)(\(id), \(url))"
 	}
 	
-	override open var debugDescription: String {
+	var debugDescription: String {
 		return description
 	}
 }
 
-/// Instance counterparts of class functions
+// Instance counterparts of class functions
 extension Resource {
 	final var resourceType: ResourceType { return type(of: self).resourceType }
 	final var fields: [Field] { return type(of: self).fields }
 }
 
 public func == <T: Resource> (left: T, right: T) -> Bool {
-	return (left.id == right.id) && (left.resourceType == right.resourceType)
+    return (left.id == right.id) && (left.resourceType == right.resourceType)
 }
