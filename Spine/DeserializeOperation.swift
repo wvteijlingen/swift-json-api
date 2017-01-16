@@ -165,9 +165,18 @@ class DeserializeOperation: Operation {
 			throw SerializerError.resourceTypeMissing
 		}
 		
-		guard let id = representation["id"].string else {
-			throw SerializerError.resourceIDMissing
-		}
+        var resourceId :String?
+        
+        if let id = representation["id"].string {
+            resourceId = id
+        }
+        else if let id = representation["id"].int {
+            resourceId = String(id)
+        }
+        
+        guard let id = resourceId else {
+            throw SerializerError.resourceIDMissing
+        }
 		
 		// Dispense a resource
 		let resource = try resourceFactory.dispense(type, id: id, pool: &resourcePool, index: mappingTargetIndex)
@@ -260,8 +269,17 @@ class DeserializeOperation: Operation {
 		
 		if let linkData = serializedData["relationships"][key].dictionary {
 			let type = linkData["data"]?["type"].string ?? linkedType
+            
+            var resourceId :String?
+            
+            if let id = linkData["data"]?["id"].string {
+                resourceId = id
+            }
+            else if let id = linkData["data"]?["id"].int {
+                resourceId = String(id)
+            }
 			
-			if let id = linkData["data"]?["id"].string {
+			if let id = resourceId {
 				do {
 					resource = try resourceFactory.dispense(type, id: id, pool: &resourcePool)
 				} catch {
