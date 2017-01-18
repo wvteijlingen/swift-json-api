@@ -11,12 +11,12 @@ import SwiftyJSON
 
 
 // XXX: remove this
-public func fieldsFromDictionary(_ dictionary: [String: Field]) -> [Field] {
-	return dictionary.map { (name, field) in
-		field.name = name
-		return field
-	}
-}
+//public func fieldsFromDictionary(_ dictionary: [String: Field]) -> [Field] {
+//	return dictionary.map { (name, field) in
+//		field.name = name
+//		return field
+//	}
+//}
 
 /// Base field.
 /// Do not use this field type directly, instead use a specific subclass.
@@ -119,7 +119,7 @@ public struct PlainAttribute : Attribute {
     public var serializedName: String
     public var isReadOnly: Bool = false
 
-    init(withName name: String) {
+    init(_ name: String) {
         self.name = name
         self.serializedName = name
     }
@@ -130,7 +130,7 @@ public struct BooleanAttribute : Attribute {
     public var serializedName: String
     public var isReadOnly: Bool = false
 
-    init(withName name: String) {
+    init(_ name: String) {
         self.name = name
         self.serializedName = name
     }
@@ -142,7 +142,7 @@ public struct URLAttribute : Attribute {
     public var isReadOnly: Bool = false
     public let baseURL: URL?
 
-    init(withName name: String, for url: URL? = nil) {
+    init(_ name: String, for url: URL? = nil) {
         self.name = name
         self.serializedName = name
         self.baseURL = url
@@ -155,7 +155,7 @@ public struct DateAttribute : Attribute {
     public var isReadOnly: Bool = false
     public let format: String
 
-    init(withName name: String, format: String = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ") {
+    init(_ name: String, format: String = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ") {
         self.name = name
         self.serializedName = name
         self.format = format
@@ -295,7 +295,7 @@ public struct ToOneRelationship<T: Resource> : Relationship {
     public var serializedName: String
     public var isReadOnly: Bool = false
 
-    init(to linkedType: T.Type, withName name: String) {
+    init(_ name: String, to linkedType: T.Type) {
         self.name = name
         self.serializedName = name
     }
@@ -348,7 +348,7 @@ public struct ToManyRelationship<T: Resource> : Relationship {
     public var serializedName: String
     public var isReadOnly: Bool = false
 
-    init(to linkedType: T.Type, withName name: String) {
+    init(_ name: String, to linkedType: T.Type) {
         self.name = name
         self.serializedName = name
     }
