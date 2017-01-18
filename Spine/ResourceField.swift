@@ -74,6 +74,7 @@ public protocol Field {
                  withValueFormatters valueFormatters: ValueFormatterRegistry,
                  fromResourcePool pool: inout [Resource],
                  withFactory factory: ResourceFactory)
+    func resolve(for resource: Resource, withResourcePool pool: [Resource])
 }
 
 extension Field {
@@ -88,6 +89,8 @@ extension Field {
         newField.serializedName = serializeName
         return newField
     }
+
+    public func resolve(for resource: Resource, withResourcePool pool: [Resource]) {}
 }
 
 protocol Attribute: Field {
@@ -377,6 +380,27 @@ public struct ToManyRelationship<T: Resource> : Relationship {
             if linkedResourceCollection.linkage != nil || resource.value(forField: self.name) == nil {
                 resource.setValue(linkedResourceCollection, forField: self.name)
             }
+        }
+    }
+
+    public func resolve(for resource: Resource, withResourcePool pool: [Resource]) {
+        guard let linkedResourceCollection = resource.value(forField: self.name) as? LinkedResourceCollection<Linked> else {
+            Spine.logInfo(.serializing, "Cannot resolve relationship '\(self.name)' of \(resource.resourceType):\(resource.id!) because the JSON did not include the relationship.")
+            return
+        }
+
+        guard let linkage = linkedResourceCollection.linkage else {
+            Spine.logInfo(.serializing, "Cannot resolve relationship '\(self.name)' of \(resource.resourceType):\(resource.id!) because the JSON did not include linkage.")
+            return
+        }
+
+        let targetResources = linkage.flatMap { (link: ResourceIdentifier) in
+            return pool.filter { $0.resourceType == link.type && $0.id == link.id } as! [Linked]
+        }
+
+        if !targetResources.isEmpty {
+            linkedResourceCollection.resources = targetResources
+            linkedResourceCollection.isLoaded = true
         }
     }
 
