@@ -176,8 +176,12 @@ class DeserializeOperation: Operation {
 		resource.id = id
 		resource.url = representation["links"]["self"].URL
 		resource.meta = representation["meta"].dictionaryObject
-		extractAttributes(from: representation, intoResource: resource)
-		extractRelationships(from: representation, intoResource: resource)
+//		extractAttributes(from: representation, intoResource: resource)
+//		extractRelationships(from: representation, intoResource: resource)
+
+        for field in resource.fields {
+            field.extract(from: representation, intoResource: resource, withKeyFormatter: keyFormatter, withValueFormatters: valueFormatters)
+        }
 		
 		resource.isLoaded = true
 		
@@ -191,32 +195,32 @@ class DeserializeOperation: Operation {
 	///
 	/// - parameter serializedData: The data from which to extract the attributes.
 	/// - parameter resource:       The resource into which to extract the attributes.
-	fileprivate func extractAttributes(from serializedData: JSON, intoResource resource: Resource) {
-		for case let field as Attribute in resource.fields {
-			let key = keyFormatter.format(field)
-			if let extractedValue = extractAttribute(key, from: serializedData) {
-				let formattedValue = valueFormatters.unformatValue(extractedValue, forAttribute: field)
-				resource.setValue(formattedValue, forField: field.name)
-			}
-		}
-	}
-	
+//	fileprivate func extractAttributes(from serializedData: JSON, intoResource resource: Resource) {
+//		for case let field as Attribute in resource.fields {
+//			let key = keyFormatter.format(field)
+//			if let extractedValue = extractAttribute(key, from: serializedData) {
+//				let formattedValue = valueFormatters.unformatValue(extractedValue, forAttribute: field)
+//				resource.setValue(formattedValue, forField: field.name)
+//			}
+//		}
+//	}
+
 	/// Extracts the value for the given key from the passed serialized data.
 	///
 	/// - parameter key:            The data from which to extract the attribute.
 	/// - parameter serializedData: The key for which to extract the value from the data.
 	///
 	/// - returns: The extracted value or nil if no attribute with the given key was found in the data.
-	fileprivate func extractAttribute(_ key: String, from serializedData: JSON) -> Any? {
-		let value = serializedData["attributes"][key]
-		
-		if let _ = value.null {
-			return nil
-		} else {
-			return value.rawValue
-		}
-	}
-	
+//	fileprivate func extractAttribute(_ key: String, from serializedData: JSON) -> Any? {
+//		let value = serializedData["attributes"][key]
+//		
+//		if let _ = value.null {
+//			return nil
+//		} else {
+//			return value.rawValue
+//		}
+//	}
+
 	
 	// MARK: Relationships
 	
@@ -224,28 +228,28 @@ class DeserializeOperation: Operation {
 	///
 	/// - parameter serializedData: The data from which to extract the relationships.
 	/// - parameter resource:       The resource into which to extract the relationships.
-	fileprivate func extractRelationships(from serializedData: JSON, intoResource resource: Resource) {
-		for field in resource.fields {
-			let key = keyFormatter.format(field)
-			resource.relationships[field.name] = extractRelationshipData(serializedData["relationships"][key])
-
-			switch field {
-			case let toOne as ToOneRelationship:
-				if let linkedResource = extractToOneRelationship(key, from: serializedData, linkedType: toOne.linkedType.resourceType) {
-					if resource.value(forField: toOne.name) == nil || (resource.value(forField: toOne.name) as? Resource)?.isLoaded == false {
-						resource.setValue(linkedResource, forField: toOne.name)
-					}
-				}
-			case let toMany as ToManyRelationship:
-				if let linkedResourceCollection = extractToManyRelationship(key, from: serializedData) {
-					if linkedResourceCollection.linkage != nil || resource.value(forField: toMany.name) == nil {
-						resource.setValue(linkedResourceCollection, forField: toMany.name)
-					}
-				}
-			default: ()
-			}
-		}
-	}
+//    fileprivate func extractRelationships(from serializedData: JSON, intoResource resource: Resource) {
+//		for field in resource.fields {
+//			let key = keyFormatter.format(field)
+//			resource.relationships[field.name] = extractRelationshipData(serializedData["relationships"][key])
+//
+//			switch field {
+//            case let toOne as ToOneRelationshipProtocol:
+//                if let linkedResource = toOne.extractToOneRelationship(key, from: serializedData, linkedType: toOne.linkedType) {  //extractToOneRelationship(key, from: serializedData, linkedType: toOne.linkedType.resourceType) {  //
+//					if resource.value(forField: toOne.name) == nil || (resource.value(forField: toOne.name) as? Resource)?.isLoaded == false {
+//						resource.setValue(linkedResource, forField: toOne.name)
+//					}
+//				}
+//			case let toMany as ToManyRelationshipProtocol:
+//                if let linkedResourceCollection = toMany.extractToManyRelationship(key, from: serializedData) { //  extractToManyRelationship(key, from: serializedData, linkedType: toMany.linkedType) {
+//					if linkedResourceCollection.linkage != nil || resource.value(forField: toMany.name) == nil {
+//						resource.setValue(linkedResourceCollection, forField: toMany.name)
+//					}
+//				}
+//			default: ()
+//			}
+//		}
+//	}
 
 	/// Extracts the to-one relationship for the given key from the passed serialized data.
 	/// This method supports both the single ID form and the resource object forms.
@@ -255,33 +259,33 @@ class DeserializeOperation: Operation {
 	/// - parameter linkedType:     The type of the linked resource as it is defined on the parent resource.
 	///
 	/// - returns: The extracted relationship or nil if no relationship with the given key was found in the data.
-	fileprivate func extractToOneRelationship(_ key: String, from serializedData: JSON, linkedType: ResourceType) -> Resource? {
-		var resource: Resource? = nil
-		
-		if let linkData = serializedData["relationships"][key].dictionary {
-			let type = linkData["data"]?["type"].string ?? linkedType
-			
-			if let id = linkData["data"]?["id"].string {
-				do {
-					resource = try resourceFactory.dispense(type, id: id, pool: &resourcePool)
-				} catch {
-					resource = try! resourceFactory.dispense(linkedType, id: id, pool: &resourcePool)
-				}
-			} else {
-				do {
-					resource = try resourceFactory.instantiate(type)
-				} catch {
-					resource = try! resourceFactory.instantiate(linkedType)
-				}
-			}
-			
-			if let resourceURL = linkData["links"]?["related"].URL {
-				resource!.url = resourceURL
-			}
-		}
-		
-		return resource
-	}
+//	fileprivate func extractToOneRelationship(_ key: String, from serializedData: JSON, linkedType: ResourceType) -> Resource? {
+//		var resource: Resource? = nil
+//		
+//		if let linkData = serializedData["relationships"][key].dictionary {
+//			let type = linkData["data"]?["type"].string ?? linkedType
+//			
+//			if let id = linkData["data"]?["id"].string {
+//				do {
+//					resource = try resourceFactory.dispense(type, id: id, pool: &resourcePool)
+//				} catch {
+//					resource = try! resourceFactory.dispense(linkedType, id: id, pool: &resourcePool)
+//				}
+//			} else {
+//				do {
+//					resource = try resourceFactory.instantiate(type)
+//				} catch {
+//					resource = try! resourceFactory.instantiate(linkedType)
+//				}
+//			}
+//			
+//			if let resourceURL = linkData["links"]?["related"].URL {
+//				resource!.url = resourceURL
+//			}
+//		}
+//		
+//		return resource
+//	}
 
 	/// Extracts the to-many relationship for the given key from the passed serialized data.
 	/// This method supports both the array of IDs form and the resource object forms.
@@ -290,46 +294,46 @@ class DeserializeOperation: Operation {
 	/// - parameter serializedData: The data from which to extract the relationship.
 	///
 	/// - returns: The extracted relationship or nil if no relationship with the given key was found in the data.
-	fileprivate func extractToManyRelationship(_ key: String, from serializedData: JSON) -> LinkedResourceCollection? {
-		var resourceCollection: LinkedResourceCollection? = nil
+//    fileprivate func extractToManyRelationship<T: Resource>(_ key: String, from serializedData: JSON, linkedType type: Resource.Type) -> LinkedResourceCollection<T>? {
+//		var resourceCollection: LinkedResourceCollection<T>? = nil
+//
+//		if let linkData = serializedData["relationships"][key].dictionary {
+//			let resourcesURL: URL? = linkData["links"]?["related"].URL
+//			let linkURL: URL? = linkData["links"]?["self"].URL
+//			
+//			if let linkage = linkData["data"]?.array {
+//				let mappedLinkage = linkage.map { ResourceIdentifier(type: $0["type"].stringValue, id: $0["id"].stringValue) }
+//				resourceCollection = LinkedResourceCollection<T>(resourcesURL: resourcesURL, linkURL: linkURL, linkage: mappedLinkage)
+//			} else {
+//				resourceCollection = LinkedResourceCollection<T>(resourcesURL: resourcesURL, linkURL: linkURL, linkage: nil)
+//			}
+//		}
+//		
+//		return resourceCollection
+//	}
 
-		if let linkData = serializedData["relationships"][key].dictionary {
-			let resourcesURL: URL? = linkData["links"]?["related"].URL
-			let linkURL: URL? = linkData["links"]?["self"].URL
-			
-			if let linkage = linkData["data"]?.array {
-				let mappedLinkage = linkage.map { ResourceIdentifier(type: $0["type"].stringValue, id: $0["id"].stringValue) }
-				resourceCollection = LinkedResourceCollection(resourcesURL: resourcesURL, linkURL: linkURL, linkage: mappedLinkage)
-			} else {
-				resourceCollection = LinkedResourceCollection(resourcesURL: resourcesURL, linkURL: linkURL, linkage: nil)
-			}
-		}
-		
-		return resourceCollection
-	}
-	
 	/// Extract the relationship data from the given JSON.
 	///
 	/// - parameter linkData: The JSON from which to extract relationship data.
 	///
 	/// - returns: A RelationshipData object.
-	fileprivate func extractRelationshipData(_ linkData: JSON) -> RelationshipData {
-		let selfURL = linkData["links"]["self"].URL
-		let relatedURL = linkData["links"]["related"].URL
-		let data: [ResourceIdentifier]?
-		
-		if let toOne = linkData["data"].dictionary {
-			data = [ResourceIdentifier(type: toOne["type"]!.stringValue, id: toOne["id"]!.stringValue)]
-		} else if let toMany = linkData["data"].array {
-			data = toMany.map { JSON -> ResourceIdentifier in
-				return ResourceIdentifier(type: JSON["type"].stringValue, id: JSON["id"].stringValue)
-			}
-		} else {
-			data = nil
-		}
-		
-		return RelationshipData(selfURL: selfURL, relatedURL: relatedURL, data: data)
-	}
+//	fileprivate func extractRelationshipData(_ linkData: JSON) -> RelationshipData {
+//		let selfURL = linkData["links"]["self"].URL
+//		let relatedURL = linkData["links"]["related"].URL
+//		let data: [ResourceIdentifier]?
+//		
+//		if let toOne = linkData["data"].dictionary {
+//			data = [ResourceIdentifier(type: toOne["type"]!.stringValue, id: toOne["id"]!.stringValue)]
+//		} else if let toMany = linkData["data"].array {
+//			data = toMany.map { JSON -> ResourceIdentifier in
+//				return ResourceIdentifier(type: JSON["type"].stringValue, id: JSON["id"].stringValue)
+//			}
+//		} else {
+//			data = nil
+//		}
+//		
+//		return RelationshipData(selfURL: selfURL, relatedURL: relatedURL, data: data)
+//	}
 	
 	/// Resolves the relations of the fetched resources.
 	fileprivate func resolveRelationships() {

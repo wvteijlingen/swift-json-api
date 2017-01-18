@@ -76,7 +76,7 @@ public class Serializer {
 	/// - throws: SerializerError that can occur in the serialization.
 	///
 	/// - returns: Serialized data.
-	public func serializeResources(_ resources: [Resource], options: SerializationOptions = [.IncludeID]) throws -> Data {
+    public func serializeResources<T: Resource>(_ resources: [T], options: SerializationOptions = [.IncludeID]) throws -> Data {
 		let document = JSONAPIDocument(data: resources, included: nil, errors: nil, meta: nil, links: nil, jsonapi: nil)
 		return try serializeDocument(document, options: options)
 	}
@@ -167,6 +167,8 @@ public struct JSONAPIDocument {
 	
 	/// Included resources extracted from the response.
 	public var included: [Resource]?
+
+    public var inc: [String: Resource]?
 	
 	/// Errors extracted from the response.
 	public var errors: [APIError]?

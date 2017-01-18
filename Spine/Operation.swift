@@ -165,14 +165,14 @@ class FetchOperation<T: Resource>: ConcurrentOperation {
 }
 
 /// DeleteOperation deletes a resource from a Spine.
-class DeleteOperation: ConcurrentOperation {
+class DeleteOperation<T: Resource>: ConcurrentOperation {
 	/// The resource to delete.
-	let resource: Resource
+	let resource: T
 	
 	/// The result of the operation. You can safely force unwrap this in the completionBlock.
 	var result: Failable<Void, SpineError>?
 	
-	init(resource: Resource, spine: Spine) {
+	init(resource: T, spine: Spine) {
 		self.resource = resource
 		super.init()
 		self.spine = spine
@@ -208,9 +208,9 @@ class DeleteOperation: ConcurrentOperation {
 }
 
 /// A SaveOperation updates or adds a resource in a Spine.
-class SaveOperation: ConcurrentOperation {
+class SaveOperation<T: Resource>: ConcurrentOperation {
 	/// The resource to save.
-	let resource: Resource
+	let resource: T
 	
 	/// The result of the operation. You can safely force unwrap this in the completionBlock.
 	var result: Failable<Void, SpineError>?
@@ -220,7 +220,7 @@ class SaveOperation: ConcurrentOperation {
 	
 	fileprivate let relationshipOperationQueue = OperationQueue()
 	
-	init(resource: Resource, spine: Spine) {
+	init(resource: T, spine: Spine) {
 		self.resource = resource
 		self.isNewResource = (resource.id == nil)
 		super.init()
@@ -394,11 +394,11 @@ private class RelationshipOperation: ConcurrentOperation {
 }
 
 /// A RelationshipReplaceOperation replaces the entire contents of a relationship.
-private class RelationshipReplaceOperation: RelationshipOperation {
-	let resource: Resource
-	let relationship: Relationship
+private class RelationshipReplaceOperation<T: Resource, U: Resource>: RelationshipOperation {
+	let resource: T
+	let relationship: Relationship<U>
 
-	init(resource: Resource, relationship: Relationship, spine: Spine) {
+	init(resource: T, relationship: Relationship<U>, spine: Spine) {
 		self.resource = resource
 		self.relationship = relationship
 		super.init()
@@ -411,9 +411,9 @@ private class RelationshipReplaceOperation: RelationshipOperation {
 		
 		switch relationship {
 		case is ToOneRelationship:
-			payload = try! serializer.serializeLinkData(resource.value(forField: relationship.name) as? Resource)
+			payload = try! serializer.serializeLinkData(resource.value(forField: relationship.name) as? T)
 		case is ToManyRelationship:
-			let relatedResources = (resource.value(forField: relationship.name) as? ResourceCollection)?.resources ?? []
+			let relatedResources = (resource.value(forField: relationship.name) as? ResourceCollection<T>)?.resources ?? []
 			payload = try! serializer.serializeLinkData(relatedResources)
 		default:
 			assertionFailure("Cannot only replace relationship contents for ToOneRelationship and ToManyRelationship")
@@ -425,17 +425,18 @@ private class RelationshipReplaceOperation: RelationshipOperation {
 	}
 }
 
+private enum Mutation {
+    case add, remove
+}
+
 /// A RelationshipMutateOperation mutates a to-many relationship by adding or removing linked resources.
-private class RelationshipMutateOperation: RelationshipOperation {
-	enum Mutation {
-		case add, remove
-	}
+private class RelationshipMutateOperation<T: Resource>: RelationshipOperation {
 	
-	let resource: Resource
+	let resource: T
 	let relationship: ToManyRelationship
 	let mutation: Mutation
 
-	init(resource: Resource, relationship: ToManyRelationship, mutation: Mutation, spine: Spine) {
+	init(resource: T, relationship: ToManyRelationship, mutation: Mutation, spine: Spine) {
 		self.resource = resource
 		self.relationship = relationship
 		self.mutation = mutation
@@ -444,9 +445,9 @@ private class RelationshipMutateOperation: RelationshipOperation {
 	}
 
 	override func execute() {
-		let resourceCollection = resource.value(forField: relationship.name) as! LinkedResourceCollection
+		let resourceCollection = resource.value(forField: relationship.name) as! LinkedResourceCollection<T>
 		let httpMethod: String
-		let relatedResources: [Resource]
+		let relatedResources: [T]
 		
 		switch mutation {
 		case .add:

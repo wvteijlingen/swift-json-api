@@ -26,11 +26,11 @@ class Foo: Resource {
 	
 	override class var fields: [Field] {
 		return fieldsFromDictionary([
-			"stringAttribute": Attribute(),
-			"integerAttribute": Attribute(),
-			"floatAttribute": Attribute(),
+			"stringAttribute": PlainAttribute(),
+			"integerAttribute": PlainAttribute(),
+			"floatAttribute": PlainAttribute(),
 			"booleanAttribute": BooleanAttribute(),
-			"nilAttribute": Attribute(),
+			"nilAttribute": PlainAttribute(),
 			"dateAttribute": DateAttribute(),
 			"toOneAttribute": ToOneRelationship(Bar.self),
 			"toManyAttribute": ToManyRelationship(Bar.self)

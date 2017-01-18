@@ -42,7 +42,7 @@ public protocol ValueFormatter {
 
 /// A value formatter Registry keeps a list of value formatters, and chooses between these value formatters
 /// to transform values between the serialized and deserialized form.
-struct ValueFormatterRegistry {
+public struct ValueFormatterRegistry {
 	/// Registered serializer functions.
 	fileprivate var formatters: [(Any, Attribute) -> Any?] = []
 	
@@ -134,7 +134,7 @@ struct ValueFormatterRegistry {
 /// it will return an absolute URL, relative to the baseURL.
 private struct URLValueFormatter: ValueFormatter {
 	func unformatValue(_ value: String, forAttribute attribute: URLAttribute) -> URL {
-		return URL(string: value, relativeTo: attribute.baseURL as URL?)!
+		return URL(string: value, relativeTo: attribute.baseURL)!
 	}
 	
 	func formatValue(_ value: URL, forAttribute attribute: URLAttribute) -> String {

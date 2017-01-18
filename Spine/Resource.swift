@@ -79,7 +79,7 @@ public struct RelationshipData {
 
 /// A base recource class that provides some defaults for resources.
 /// You can create custom resource classes by subclassing from Resource.
-public protocol Resource: NSCoding, NSObjectProtocol, Equatable {
+public protocol Resource: class, NSCoding, NSObjectProtocol {
 	/// The resource type in plural form.
     static var resourceType: ResourceType { get }
 //	open class var resourceType: ResourceType {
@@ -119,6 +119,9 @@ public protocol Resource: NSCoding, NSObjectProtocol, Equatable {
 
     /// Returns the field named `name`, or nil if no such field exists.
     static func field(named name: String) -> Field?
+
+    /// XXX: New stuff
+    static func includeKeys(_ keys: [String], with formatter: KeyFormatter) -> [String]
 }
 
 extension Resource where Self: NSObject {
@@ -191,6 +194,25 @@ extension Resource where Self: NSObject {
 	static func field(named name: String) -> Field? {
 		return fields.filter { $0.name == name }.first
 	}
+
+    static func includeKeys(_ keys: [String], with formatter: KeyFormatter) -> [String] {
+        if keys.count == 0 {
+            return []
+        }
+
+        let k = keys[0]
+
+        if let field = self.field(named: k), let relatedType = field.relatedType {
+            let remainingKeys = Array(keys[1..<keys.count])
+            return [formatter.format(field)] + relatedType.includeKeys(remainingKeys, with: formatter)
+        }
+//        for part in include.components(separatedBy: ".") {
+//            if let relationship = relatedResourceType.field(named: part) as? Relationship {
+//                keys.append(keyFormatter.format(relationship))
+//                relatedResourceType = relationship.linkedType
+//            }
+        return []
+    }
 }
 
 extension Resource {

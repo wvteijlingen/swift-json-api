@@ -34,7 +34,7 @@ public protocol Router: class {
 	
 	- returns: The URL.
 	*/
-	func urlForRelationship<T: Resource>(_ relationship: Relationship, ofResource resource: T) -> URL
+    func urlForRelationship<T: Resource, U: Relationship>(_ relationship: U, ofResource resource: T) -> URL
 	
 	/**
 	Returns an URL that represents the given query.
@@ -69,7 +69,7 @@ open class JSONAPIRouter: Router {
 		return baseURL.appendingPathComponent(type)
 	}
 	
-	open func urlForRelationship<T: Resource>(_ relationship: Relationship, ofResource resource: T) -> URL {
+    open func urlForRelationship<T: Resource, U: Relationship>(_ relationship: U, ofResource resource: T) -> URL {
 		if let selfURL = resource.relationships[relationship.name]?.selfURL {
 			return selfURL
 		}
@@ -115,15 +115,19 @@ open class JSONAPIRouter: Router {
 			var resolvedIncludes = [String]()
 			
 			for include in query.includes {
-				var keys = [String]()
-				
-				var relatedResourceType: Resource.Type = T.self
-				for part in include.components(separatedBy: ".") {
-					if let relationship = relatedResourceType.field(named: part) as? Relationship {
-						keys.append(keyFormatter.format(relationship))
-						relatedResourceType = relationship.linkedType
-					}
-				}
+                let keys = T.includeKeys(include.components(separatedBy: "."), with: keyFormatter)
+
+//				var keys = [String]()
+//				
+//				var relatedResourceType: Resource.Type = T.self
+//				for part in include.components(separatedBy: ".") {
+//					if let relationship = relatedResourceType.field(named: part) as? Relationship {
+//						keys.append(keyFormatter.format(relationship))
+//						relatedResourceType = relationship.linkedType
+//					}
+//				}
+
+
 				
 				resolvedIncludes.append(keys.joined(separator: "."))
 			}
