@@ -79,7 +79,7 @@ public struct RelationshipData {
 
 /// A base recource class that provides some defaults for resources.
 /// You can create custom resource classes by subclassing from Resource.
-public protocol Resource: class, NSCoding, NSObjectProtocol {
+public protocol Resource: class, NSObjectProtocol {  // NSCoding,
 	/// The resource type in plural form.
     static var resourceType: ResourceType { get }
 //	open class var resourceType: ResourceType {
@@ -122,6 +122,8 @@ public protocol Resource: class, NSCoding, NSObjectProtocol {
 
     /// XXX: New stuff
     static func includeKeys(_ keys: [String], with formatter: KeyFormatter) -> [String]
+
+    init()
 }
 
 extension Resource where Self: NSObject {
@@ -137,39 +139,39 @@ extension Resource where Self: NSObject {
         return [:]
     }
 
-	public init() {
-        // XXX: check this for recursion
-        self.init()
-    }
+//	public init() {
+//        // XXX: check this for recursion
+//        self.init()
+//    }
 
-	public init(coder: NSCoder) {
-//		super.init()
-        self.init()
-		self.id = coder.decodeObject(forKey: "id") as? String
-		self.url = coder.decodeObject(forKey: "url") as? URL
-		self.isLoaded = coder.decodeBool(forKey: "isLoaded")
-		self.meta = coder.decodeObject(forKey: "meta") as? [String: AnyObject]
-		
-		if let relationshipsData = coder.decodeObject(forKey: "relationships") as? [String: NSDictionary] {
-			var relationships = [String: RelationshipData]()
-			for (key, value) in relationshipsData {
-				relationships[key] = RelationshipData.init(dictionary: value)
-			}
-		}
-	}
-
-	public func encode(with coder: NSCoder) {
-		coder.encode(id, forKey: "id")
-		coder.encode(url, forKey: "url")
-		coder.encode(isLoaded, forKey: "isLoaded")
-		coder.encode(meta, forKey: "meta")
-		
-		var relationshipsData = [String: NSDictionary]()
-		for (key, value) in relationships {
-			relationshipsData[key] = value.toDictionary()
-		}
-		coder.encode(relationshipsData, forKey: "relationships")
-	}
+//	public init(coder: NSCoder) {
+////		super.init()
+////        self.init()
+//		self.id = coder.decodeObject(forKey: "id") as? String
+//		self.url = coder.decodeObject(forKey: "url") as? URL
+//		self.isLoaded = coder.decodeBool(forKey: "isLoaded")
+//		self.meta = coder.decodeObject(forKey: "meta") as? [String: AnyObject]
+//		
+//		if let relationshipsData = coder.decodeObject(forKey: "relationships") as? [String: NSDictionary] {
+//			var relationships = [String: RelationshipData]()
+//			for (key, value) in relationshipsData {
+//				relationships[key] = RelationshipData.init(dictionary: value)
+//			}
+//		}
+//	}
+//
+//	public func encode(with coder: NSCoder) {
+//		coder.encode(id, forKey: "id")
+//		coder.encode(url, forKey: "url")
+//		coder.encode(isLoaded, forKey: "isLoaded")
+//		coder.encode(meta, forKey: "meta")
+//		
+//		var relationshipsData = [String: NSDictionary]()
+//		for (key, value) in relationships {
+//			relationshipsData[key] = value.toDictionary()
+//		}
+//		coder.encode(relationshipsData, forKey: "relationships")
+//	}
 
     /// Returns the value for the field named `field`.
 	func value(forField field: String) -> Any? {

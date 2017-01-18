@@ -180,7 +180,7 @@ class DeserializeOperation: Operation {
 //		extractRelationships(from: representation, intoResource: resource)
 
         for field in resource.fields {
-            field.extract(from: representation, intoResource: resource, withKeyFormatter: keyFormatter, withValueFormatters: valueFormatters)
+            field.extract(from: representation, intoResource: resource, withKeyFormatter: keyFormatter, withValueFormatters: valueFormatters, fromResourcePool: &resourcePool, withFactory: resourceFactory)
         }
 		
 		resource.isLoaded = true

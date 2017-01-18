@@ -10,7 +10,7 @@ import Foundation
 
 
 /// A ResourceFactory creates resources from given factory funtions.
-struct ResourceFactory {
+public struct ResourceFactory {
 	
 	fileprivate var resourceTypes: [ResourceType: Resource.Type] = [:]
 
@@ -51,22 +51,45 @@ struct ResourceFactory {
 	/// - throws: A SerializerError.resourceTypeUnregistered erro when the type is not registered.
 	///
 	/// - returns: A resource with the given type and id.
-	func dispense(_ type: ResourceType, id: String, pool: inout [Resource], index: Int? = nil) throws -> Resource {
-        var resource: Resource! = pool.filter { $0.resourceType == type && $0.id == id }.first
-		
-		if resource == nil && index != nil && !pool.isEmpty {
-			let applicableResources = pool.filter { $0.resourceType == type }
-			if index! < applicableResources.count {
-				resource = applicableResources[index!]
-			}
-		}
-		
-		if resource == nil {
-			resource = try instantiate(type)
-			resource.id = id
-			pool.append(resource)
-		}
-		
-		return resource
-	}
+//    func dispense<T: Resource>(_ type: ResourceType, id: String, pool: inout [Resource], index: Int? = nil) throws -> T {
+//
+//        if let resource = (pool.filter { $0.resourceType == type && $0.id == id }.first) as? T {
+//            return resource
+//        }
+//		
+//		if !pool.isEmpty {
+//            if let applicableResources = (pool.filter { $0.resourceType == type }) as? [T], let index = index {
+//                if index < applicableResources.count {
+//                    return applicableResources[index]
+//                }
+//            }
+//
+//		}
+//
+//        let resource = try instantiate(type) as! T
+//        resource.id = id
+//        pool.append(resource)
+//        return resource
+//	}
+
+    func dispense<T: Resource>(_ type: T.Type, id: String, pool: inout [Resource], index: Int? = nil) -> T {
+
+        if let resource = (pool.filter { $0.resourceType == T.resourceType && $0.id == id }.first) as? T {
+            return resource
+        }
+
+        if !pool.isEmpty {
+            if let applicableResources = (pool.filter { $0.resourceType == T.resourceType }) as? [T], let index = index {
+                if index < applicableResources.count {
+                    return applicableResources[index]
+                }
+            }
+
+        }
+
+        let resource = T.init()
+        resource.id = id
+        pool.append(resource)
+        return resource
+    }
 }

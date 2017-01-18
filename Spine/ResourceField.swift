@@ -71,7 +71,9 @@ public protocol Field {
     func extract(from serializedData: JSON,
                  intoResource resource: Resource,
                  withKeyFormatter keyFormatter: KeyFormatter,
-                 withValueFormatters valueFormatters: ValueFormatterRegistry)
+                 withValueFormatters valueFormatters: ValueFormatterRegistry,
+                 fromResourcePool pool: inout [Resource],
+                 withFactory factory: ResourceFactory)
 }
 
 extension Field {
@@ -100,7 +102,9 @@ extension Attribute {
     public func extract(from serializedData: JSON,
                         intoResource resource: Resource,
                         withKeyFormatter keyFormatter: KeyFormatter,
-                        withValueFormatters valueFormatters: ValueFormatterRegistry) {
+                        withValueFormatters valueFormatters: ValueFormatterRegistry,
+                        fromResourcePool pool: inout [Resource],
+                        withFactory factory: ResourceFactory) {
         let key = keyFormatter.format(self)
         let value = serializedData["attributes"][key]
 
@@ -303,30 +307,23 @@ public struct ToOneRelationship<T: Resource> : Relationship {
     public func extract(from serializedData: JSON,
                         intoResource resource: Resource,
                         withKeyFormatter keyFormatter: KeyFormatter,
-                        withValueFormatters valueFormatters: ValueFormatterRegistry) {
+                        withValueFormatters valueFormatters: ValueFormatterRegistry,
+                        fromResourcePool pool: inout [Resource],
+                        withFactory factory: ResourceFactory) {
         let key = keyFormatter.format(self)
         resource.relationships[self.name] = self.extractRelationshipData(serializedData["relationships"][key])
 
         var linkedResource: T? = nil
 
         if let linkData = serializedData["relationships"][key].dictionary {
-            let type = linkData["data"]?["type"].string ?? Linked.resourceType
+            assert(linkData["data"]?["type"].string == Linked.resourceType)
 
-            // XXX: do not remove this
-            //            if let id = linkData["data"]?["id"].string {
-            //                do {
-            //                    linkedResource = try resourceFactory.dispense(type, id: id, pool: &resourcePool)
-            //                } catch {
-            //                    linkedResource = try! resourceFactory.dispense(linkedType.resourceType, id: id, pool: &resourcePool)
-            //                }
-            //            } else {
-            //                do {
-            //                    linkedResource = try resourceFactory.instantiate(type)
-            //                } catch {
-            //                    linkedResource = try! resourceFactory.instantiate(linkedType.resourceType)
-            //                }
-            //            }
-            
+            if let id = linkData["data"]?["id"].string {
+                linkedResource = factory.dispense(Linked.self, id: id, pool: &pool)
+            } else {
+                linkedResource = Linked.init()
+            }
+
             if let resourceURL = linkData["links"]?["related"].URL {
                 linkedResource!.url = resourceURL
             }
@@ -356,7 +353,9 @@ public struct ToManyRelationship<T: Resource> : Relationship {
     public func extract(from serializedData: JSON,
                         intoResource resource: Resource,
                         withKeyFormatter keyFormatter: KeyFormatter,
-                        withValueFormatters valueFormatters: ValueFormatterRegistry) {
+                        withValueFormatters valueFormatters: ValueFormatterRegistry,
+                        fromResourcePool: inout [Resource],
+                        withFactory: ResourceFactory) {
         let key = keyFormatter.format(self)
         resource.relationships[self.name] = self.extractRelationshipData(serializedData["relationships"][key])
 
