@@ -56,15 +56,22 @@ class SerializeOperation: Operation {
 		
 		// Serialize ID
 		if let id = resource.id , options.contains(.IncludeID) {
-			serializedData["id"] = id as AnyObject?
+			serializedData["id"] = id //as AnyObject?
 		}
 		
 		// Serialize type
-		serializedData["type"] = resource.resourceType as AnyObject?
+		serializedData["type"] = resource.resourceType //as AnyObject?
 		
 		// Serialize fields
-		addAttributes(from: resource, to: &serializedData )
-		addRelationships(from: resource, to: &serializedData)
+        for field in resource.fields where !field.isReadOnly {
+            field.serialize(from: resource,
+                            into: &serializedData,
+                            withKeyFormatter: keyFormatter,
+                            withValueFormatters: valueFormatters,
+                            withOptions: options)
+        }
+//		addAttributes(from: resource, to: &serializedData )
+//		addRelationships(from: resource, to: &serializedData)
 		
 		return serializedData
 	}
@@ -76,23 +83,23 @@ class SerializeOperation: Operation {
 	///
 	/// - parameter resource:       The resource whose attributes to add.
 	/// - parameter serializedData: The data to add the attributes to.
-	fileprivate func addAttributes(from resource: Resource, to serializedData: inout [String: Any]) {
-		var attributes = [String: Any]();
-		
-		for case let field as Attribute in resource.fields where field.isReadOnly == false {
-			let key = keyFormatter.format(field)
-			
-			Spine.logDebug(.serializing, "Serializing attribute \(field) as '\(key)'")
-			
-			if let unformattedValue = resource.value(forField: field.name) {
-				attributes[key] = valueFormatters.formatValue(unformattedValue, forAttribute: field)
-			} else if(!options.contains(.OmitNullValues)){
-				attributes[key] = NSNull()
-			}
-		}
-		
-		serializedData["attributes"] = attributes
-	}
+//	fileprivate func addAttributes(from resource: Resource, to serializedData: inout [String: Any]) {
+//		var attributes = [String: Any]();
+//		
+//		for case let field as Attribute in resource.fields where field.isReadOnly == false {
+//			let key = keyFormatter.format(field)
+//			
+//			Spine.logDebug(.serializing, "Serializing attribute \(field) as '\(key)'")
+//			
+//			if let unformattedValue = resource.value(forField: field.name) {
+//				attributes[key] = valueFormatters.formatValue(unformattedValue, forAttribute: field)
+//			} else if(!options.contains(.OmitNullValues)){
+//				attributes[key] = NSNull()
+//			}
+//		}
+//		
+//		serializedData["attributes"] = attributes
+//	}
 
 	
 	// MARK: Relationships
@@ -101,81 +108,81 @@ class SerializeOperation: Operation {
 	///
 	/// - parameter resource:       The resource whose relationships to add.
 	/// - parameter serializedData: The data to add the relationships to.
-	fileprivate func addRelationships(from resource: Resource, to serializedData: inout [String: Any]) {
-		for case let field as Relationship in resource.fields where field.isReadOnly == false {
-			let key = keyFormatter.format(field)
-			
-			Spine.logDebug(.serializing, "Serializing relationship \(field) as '\(key)'")
-			
-			switch field {
-			case let toOne as ToOneRelationship:
-				if options.contains(.IncludeToOne) {
-					addToOneRelationship(resource.value(forField: field.name) as? Resource, to: &serializedData, key: key, type: toOne.linkedType.resourceType)
-				}
-			case let toMany as ToManyRelationship:
-				if options.contains(.IncludeToMany) {
-					addToManyRelationship(resource.value(forField: field.name) as? ResourceCollection, to: &serializedData, key: key, type: toMany.linkedType.resourceType)
-				}
-			default: ()
-			}
-		}
-	}
-	
+//	fileprivate func addRelationships(from resource: Resource, to serializedData: inout [String: Any]) {
+//		for case let field as Relationship in resource.fields where field.isReadOnly == false {
+//			let key = keyFormatter.format(field)
+//			
+//			Spine.logDebug(.serializing, "Serializing relationship \(field) as '\(key)'")
+//			
+//			switch field {
+//			case let toOne as ToOneRelationship:
+//				if options.contains(.IncludeToOne) {
+//					addToOneRelationship(resource.value(forField: field.name) as? Resource, to: &serializedData, key: key, type: toOne.linkedType.resourceType)
+//				}
+//			case let toMany as ToManyRelationship:
+//				if options.contains(.IncludeToMany) {
+//					addToManyRelationship(resource.value(forField: field.name) as? ResourceCollection, to: &serializedData, key: key, type: toMany.linkedType.resourceType)
+//				}
+//			default: ()
+//			}
+//		}
+//	}
+
 	/// Adds the given resource as a to to-one relationship to the serialized data.
 	///
 	/// - parameter linkedResource: The linked resource to add to the serialized data.
 	/// - parameter serializedData: The data to add the related resource to.
 	/// - parameter key:            The key to add to the serialized data.
 	/// - parameter type:           The resource type of the linked resource as defined on the parent resource.
-	fileprivate func addToOneRelationship(_ linkedResource: Resource?, to serializedData: inout [String: Any], key: String, type: ResourceType) {
-		let serializedId: Any
-		if let resourceId = linkedResource?.id {
-			serializedId = resourceId
-		} else {
-			serializedId = NSNull()
-		}
-		
-		let serializedRelationship = [
-			"data": [
-				"type": type,
-				"id": serializedId
-			]
-		]
-		
-		if serializedData["relationships"] == nil {
-			serializedData["relationships"] = [key: serializedRelationship]
-		} else {
-			var relationships = serializedData["relationships"] as! [String: Any]
-			relationships[key] = serializedRelationship
-			serializedData["relationships"] = relationships
-		}
-	}
-	
+//	fileprivate func addToOneRelationship(_ linkedResource: Resource?, to serializedData: inout [String: Any], key: String, type: ResourceType) {
+//		let serializedId: Any
+//		if let resourceId = linkedResource?.id {
+//			serializedId = resourceId
+//		} else {
+//			serializedId = NSNull()
+//		}
+//		
+//		let serializedRelationship = [
+//			"data": [
+//				"type": type,
+//				"id": serializedId
+//			]
+//		]
+//		
+//		if serializedData["relationships"] == nil {
+//			serializedData["relationships"] = [key: serializedRelationship]
+//		} else {
+//			var relationships = serializedData["relationships"] as! [String: Any]
+//			relationships[key] = serializedRelationship
+//			serializedData["relationships"] = relationships
+//		}
+//	}
+
 	/// Adds the given resources as a to to-many relationship to the serialized data.
 	///
 	/// - parameter linkedResources: The linked resources to add to the serialized data.
 	/// - parameter serializedData:  The data to add the related resources to.
 	/// - parameter key:             The key to add to the serialized data.
 	/// - parameter type:            The resource type of the linked resource as defined on the parent resource.
-	fileprivate func addToManyRelationship(_ linkedResources: ResourceCollection?, to serializedData: inout [String: Any], key: String, type: ResourceType) {
-		var resourceIdentifiers: [ResourceIdentifier] = []
-		
-		if let resources = linkedResources?.resources {
-			resourceIdentifiers = resources.filter { $0.id != nil }.map { resource in
-				return ResourceIdentifier(type: resource.resourceType, id: resource.id!)
-			}
-		}
-		
-		let serializedRelationship = [
-			"data": resourceIdentifiers.map { $0.toDictionary() }
-		]
-		
-		if serializedData["relationships"] == nil {
-			serializedData["relationships"] = [key: serializedRelationship]
-		} else {
-			var relationships = serializedData["relationships"] as! [String: Any]
-			relationships[key] = serializedRelationship
-			serializedData["relationships"] = relationships
-		}
-	}
+//	fileprivate func addToManyRelationship(_ linkedResources: ResourceCollection?, to serializedData: inout [String: Any], key: String, type: ResourceType) {
+//		var resourceIdentifiers: [ResourceIdentifier] = []
+//		
+//		if let resources = linkedResources?.resources {
+//			resourceIdentifiers = resources.filter { $0.id != nil }.map { resource in
+//				return ResourceIdentifier(type: resource.resourceType, id: resource.id!)
+//			}
+//		}
+//		
+//		let serializedRelationship = [
+//			"data": resourceIdentifiers.map { $0.toDictionary() }
+//		]
+//		
+//		if serializedData["relationships"] == nil {
+//			serializedData["relationships"] = [key: serializedRelationship]
+//		} else {
+//			var relationships = serializedData["relationships"] as! [String: Any]
+//			relationships[key] = serializedRelationship
+//			serializedData["relationships"] = relationships
+//		}
+//	}
 }

@@ -68,6 +68,12 @@ public protocol Field {
 
     var relatedType: Resource.Type? { get }
 
+    func serialize(from resource: Resource,
+                   into serializedData: inout [String: Any],
+                   withKeyFormatter keyFormatter: KeyFormatter,
+                   withValueFormatters valueFormatters: ValueFormatterRegistry,
+                   withOptions options: SerializationOptions)
+
     func extract(from serializedData: JSON,
                  intoResource resource: Resource,
                  withKeyFormatter keyFormatter: KeyFormatter,
@@ -100,6 +106,33 @@ protocol Attribute: Field {
 extension Attribute {
     public var relatedType: Resource.Type? {
         return nil
+    }
+
+    public func serialize(from resource: Resource,
+                          into serializedData: inout [String: Any],
+                          withKeyFormatter keyFormatter: KeyFormatter,
+                          withValueFormatters valueFormatters: ValueFormatterRegistry,
+                          withOptions options: SerializationOptions) {
+        let key = keyFormatter.format(self)
+
+        Spine.logDebug(.serializing, "Serializing attribute \(self) as '\(key)'")
+
+        var value: Any? = nil
+        if let unformattedValue = resource.value(forField: self.name) {
+            value = valueFormatters.formatValue(unformattedValue, forAttribute: self)
+        } else if(!options.contains(.OmitNullValues)){
+            value = NSNull()
+        }
+
+        if let value = value {
+            if serializedData["attributes"] == nil {
+                serializedData["attributes"] = [key: value]
+            } else {
+                var relationships = serializedData["attributes"] as! [String: Any]
+                relationships[key] = value
+                serializedData["attributes"] = relationships
+            }
+        }
     }
 
     public func extract(from serializedData: JSON,
@@ -307,6 +340,43 @@ public struct ToOneRelationship<T: Resource> : Relationship {
         self.serializedName = name
     }
 
+    public func serialize(from resource: Resource,
+                          into serializedData: inout [String: Any],
+                          withKeyFormatter keyFormatter: KeyFormatter,
+                          withValueFormatters valueFormatters: ValueFormatterRegistry,
+                          withOptions options: SerializationOptions) {
+        let key = keyFormatter.format(self)
+
+        Spine.logDebug(.serializing, "Serializing toOne relationship \(self) as '\(key)'")
+
+        if options.contains(.IncludeToOne) {
+            let serializedId: Any
+            let linkedResource = resource.value(forField: self.name) as? Linked
+
+            if let resourceId = linkedResource?.id {
+                serializedId = resourceId
+            } else {
+                serializedId = NSNull()
+            }
+
+            let serializedRelationship = [
+                "data": [
+                    "type": Linked.resourceType,
+                    "id": serializedId
+                ]
+            ]
+
+            if serializedData["relationships"] == nil {
+                serializedData["relationships"] = [key: serializedRelationship]
+            } else {
+                var relationships = serializedData["relationships"] as! [String: Any]
+                relationships[key] = serializedRelationship
+                serializedData["relationships"] = relationships
+            }
+        }
+
+    }
+
     public func extract(from serializedData: JSON,
                         intoResource resource: Resource,
                         withKeyFormatter keyFormatter: KeyFormatter,
@@ -351,6 +421,40 @@ public struct ToManyRelationship<T: Resource> : Relationship {
     init(_ name: String, to linkedType: T.Type) {
         self.name = name
         self.serializedName = name
+    }
+
+    public func serialize(from resource: Resource,
+                          into serializedData: inout [String: Any],
+                          withKeyFormatter keyFormatter: KeyFormatter,
+                          withValueFormatters valueFormatters: ValueFormatterRegistry,
+                          withOptions options: SerializationOptions) {
+        let key = keyFormatter.format(self)
+
+        Spine.logDebug(.serializing, "Serializing toMany relationship \(self) as '\(key)'")
+
+        if options.contains(.IncludeToMany) {
+            let linkedResources = resource.value(forField: self.name) as? ResourceCollection<Linked>
+            var resourceIdentifiers: [ResourceIdentifier] = []
+
+            if let resources = linkedResources?.resources {
+                resourceIdentifiers = resources.filter { $0.id != nil }.map { resource in
+                    return ResourceIdentifier(type: resource.resourceType, id: resource.id!)
+                }
+            }
+
+            let serializedRelationship = [
+                "data": resourceIdentifiers.map { $0.toDictionary() }
+            ]
+
+            if serializedData["relationships"] == nil {
+                serializedData["relationships"] = [key: serializedRelationship]
+            } else {
+                var relationships = serializedData["relationships"] as! [String: Any]
+                relationships[key] = serializedRelationship
+                serializedData["relationships"] = relationships
+            }
+        }
+        
     }
 
     public func extract(from serializedData: JSON,
