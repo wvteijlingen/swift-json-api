@@ -175,7 +175,7 @@ class DeserializeOperation: Operation {
 		}
 		
 		// Dispense a resource
-		let resource = try resourceFactory.dispense(type, id: id, pool: &resourcePool, index: mappingTargetIndex)
+		let resource = try resourceFactory.dispenseRaw(type, id: id, pool: &resourcePool, index: mappingTargetIndex)
 		
 		// Extract data
 		resource.id = id

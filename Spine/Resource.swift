@@ -104,8 +104,8 @@ public protocol Resource: class, NSObjectProtocol {  // NSCoding,
 	/// Raw relationship data keyed by relationship name.
     var relationships: [String: RelationshipData] { get set }
 
-    var description: String { get }
-    var debugDescription: String { get }
+//    var description: String { get }
+//    var debugDescription: String { get }
 
 
     /// Returns the value for the field named `field`.
@@ -218,13 +218,13 @@ extension Resource where Self: NSObject {
 }
 
 extension Resource {
-	var description: String {
-		return "\(Self.resourceType)(\(id), \(url))"
-	}
-	
-	var debugDescription: String {
-		return description
-	}
+//	var description: String {
+//		return "\(Self.resourceType)(\(id), \(url))"
+//	}
+//	
+//	var debugDescription: String {
+//		return description
+//	}
 }
 
 // Instance counterparts of class functions

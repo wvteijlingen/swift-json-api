@@ -29,7 +29,7 @@ public class Serializer {
 	/// - throws: SerializerError that can occur in the deserialization.
 	///
 	/// - returns: A JSONAPIDocument
-	public func deserializeData(_ data: Data, mappingTargets: [Resource]? = nil) throws -> JSONAPIDocument {
+    public func deserializeData(_ data: Data, mappingTargets: [Resource]? = nil) throws -> JSONAPIDocument {
 		let deserializeOperation = DeserializeOperation(data: data, resourceFactory: resourceFactory, valueFormatters: valueFormatters, keyFormatter: keyFormatter)
 		
 		if let mappingTargets = mappingTargets {
@@ -95,22 +95,22 @@ public class Serializer {
 	/// - throws: SerializerError that can occur in the serialization.
 	///
 	/// - returns: Serialized data.
-	public func serializeLinkData(_ resource: Resource?) throws -> Data {
-		let payloadData: Any
-		
-		if let resource = resource {
-			assert(resource.id != nil, "Attempt to convert resource without id to linkage. Only resources with ids can be converted to linkage.")
-			payloadData = ["type": resource.resourceType, "id": resource.id!]
-		} else {
-			payloadData = NSNull()
-		}
-		
-		do {
-			return try JSONSerialization.data(withJSONObject: ["data": payloadData], options: JSONSerialization.WritingOptions(rawValue: 0))
-		} catch let error as NSError {
-			throw SerializerError.jsonSerializationError(error)
-		}
-	}
+//	public func serializeLinkData(_ resource: Resource?) throws -> Data {
+//		let payloadData: Any
+//		
+//		if let resource = resource {
+//			assert(resource.id != nil, "Attempt to convert resource without id to linkage. Only resources with ids can be converted to linkage.")
+//			payloadData = ["type": resource.resourceType, "id": resource.id!]
+//		} else {
+//			payloadData = NSNull()
+//		}
+//		
+//		do {
+//			return try JSONSerialization.data(withJSONObject: ["data": payloadData], options: JSONSerialization.WritingOptions(rawValue: 0))
+//		} catch let error as NSError {
+//			throw SerializerError.jsonSerializationError(error)
+//		}
+//	}
 	
 	/// Converts the given resources to link data, and serializes it into NSData.
 	/// ```json
@@ -127,23 +127,23 @@ public class Serializer {
 	/// - throws: SerializerError that can occur in the serialization.
 	///
 	/// - returns: Serialized data.
-	public func serializeLinkData(_ resources: [Resource]) throws -> Data {
-		let payloadData: Any
-		
-		if resources.isEmpty {
-			payloadData = []
-		} else {
-			payloadData = resources.map { resource in
-				return ["type": resource.resourceType, "id": resource.id!]
-			}
-		}
-		
-		do {
-			return try JSONSerialization.data(withJSONObject: ["data": payloadData], options: JSONSerialization.WritingOptions(rawValue: 0))
-		} catch let error as NSError {
-			throw SerializerError.jsonSerializationError(error)
-		}
-	}
+//	public func serializeLinkData(_ resources: [Resource]) throws -> Data {
+//		let payloadData: Any
+//		
+//		if resources.isEmpty {
+//			payloadData = []
+//		} else {
+//			payloadData = resources.map { resource in
+//				return ["type": resource.resourceType, "id": resource.id!]
+//			}
+//		}
+//		
+//		do {
+//			return try JSONSerialization.data(withJSONObject: ["data": payloadData], options: JSONSerialization.WritingOptions(rawValue: 0))
+//		} catch let error as NSError {
+//			throw SerializerError.jsonSerializationError(error)
+//		}
+//	}
 
 	/// Registers a resource class.
 	///

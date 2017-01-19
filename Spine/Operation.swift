@@ -49,7 +49,7 @@ Operating against a Spine
 =========================
 The `Spine` instance variable references the Spine against which to operate.
 */
-class ConcurrentOperation: Operation {
+public class ConcurrentOperation: Operation {
 	enum State: String {
 		case ready = "isReady"
 		case executing = "isExecuting"
@@ -67,16 +67,16 @@ class ConcurrentOperation: Operation {
 			didChangeValue(forKey: state.rawValue)
 		}
 	}
-	override var isReady: Bool {
+	override public var isReady: Bool {
 		return super.isReady && state == .ready
 	}
-	override var isExecuting: Bool {
+	override public var isExecuting: Bool {
 		return state == .executing
 	}
-	override var isFinished: Bool {
+	override public var isFinished: Bool {
 		return state == .finished
 	}
-	override var isAsynchronous: Bool {
+	override public var isAsynchronous: Bool {
 		return true
 	}
 	
@@ -96,7 +96,7 @@ class ConcurrentOperation: Operation {
 	
 	override init() {}
 	
-	final override func start() {
+	final override public func start() {
 		if isCancelled {
 			state = .finished
 		} else {
@@ -105,7 +105,7 @@ class ConcurrentOperation: Operation {
 		}
 	}
 	
-	final override func main() {
+	final override public func main() {
 		execute()
 	}
 	
@@ -307,7 +307,7 @@ class SaveOperation<T: Resource>: ConcurrentOperation {
 	}
 	
 	/// Serializes `resource` into NSData using `options`. Any error that occurs is rethrown as a SpineError.
-	fileprivate func serializePayload(_ resource: Resource, options: SerializationOptions) throws -> Data {
+    fileprivate func serializePayload<T: Resource>(_ resource: T, options: SerializationOptions) throws -> Data {
 		do {
 			let payload = try serializer.serializeResources([resource], options: options)
 			return payload
@@ -317,11 +317,11 @@ class SaveOperation<T: Resource>: ConcurrentOperation {
 	}
 
 	fileprivate func updateRelationships() {
-		let relationships = resource.fields.filter { field in
-			return field is Relationship && !field.isReadOnly
-		}
-		
-		guard !relationships.isEmpty else {
+//		let relationships = resource.fields.filter { field in
+//			return field is Relationship && !field.isReadOnly
+//		}
+
+		guard !resource.fields.isEmpty else {
 			updateResource()
 			return
 		}
@@ -334,23 +334,27 @@ class SaveOperation<T: Resource>: ConcurrentOperation {
 			}
 		}
 		
-		for relationship in relationships {
-			switch relationship {
-			case let toOne as ToOneRelationship:
-				let operation = RelationshipReplaceOperation(resource: resource, relationship: toOne, spine: spine)
-				operation.completionBlock = { [unowned operation] in completionHandler(operation.result) }
-				relationshipOperationQueue.addOperation(operation)
-
-			case let toMany as ToManyRelationship:
-				let addOperation = RelationshipMutateOperation(resource: resource, relationship: toMany, mutation: .add, spine: spine)
-				addOperation.completionBlock = { [unowned addOperation] in completionHandler(addOperation.result) }
-				relationshipOperationQueue.addOperation(addOperation)
-				
-				let removeOperation = RelationshipMutateOperation(resource: resource, relationship: toMany, mutation: .remove, spine: spine)
-				removeOperation.completionBlock = { [unowned removeOperation] in completionHandler(removeOperation.result) }
-				relationshipOperationQueue.addOperation(removeOperation)
-			default: ()
-			}
+		for field in resource.fields {
+            for operation in field.updateOperations(for: resource, wihtSpine: spine) {
+                operation.completionBlock = { [unowned operation] in completionHandler(operation.result) }
+                relationshipOperationQueue.addOperation(operation)
+            }
+//			switch relationship {
+//			case let toOne as ToOneRelationship:
+//				let operation = RelationshipReplaceOperation(resource: resource, relationship: toOne, spine: spine)
+//				operation.completionBlock = { [unowned operation] in completionHandler(operation.result) }
+//				relationshipOperationQueue.addOperation(operation)
+//
+//			case let toMany as ToManyRelationship:
+//				let addOperation = RelationshipMutateOperation(resource: resource, relationship: toMany, mutation: .add, spine: spine)
+//				addOperation.completionBlock = { [unowned addOperation] in completionHandler(addOperation.result) }
+//				relationshipOperationQueue.addOperation(addOperation)
+//				
+//				let removeOperation = RelationshipMutateOperation(resource: resource, relationship: toMany, mutation: .remove, spine: spine)
+//				removeOperation.completionBlock = { [unowned removeOperation] in completionHandler(removeOperation.result) }
+//				relationshipOperationQueue.addOperation(removeOperation)
+//			default: ()
+//			}
 		}
 	}
 	
@@ -367,7 +371,7 @@ class SaveOperation<T: Resource>: ConcurrentOperation {
 	}
 }
 
-private class RelationshipOperation: ConcurrentOperation {
+public class RelationshipOperation: ConcurrentOperation {
 	var result: Failable<Void, SpineError>?
 	
 	func handleNetworkResponse(_ statusCode: Int?, responseData: Data?, networkError: NSError?) {
@@ -394,11 +398,11 @@ private class RelationshipOperation: ConcurrentOperation {
 }
 
 /// A RelationshipReplaceOperation replaces the entire contents of a relationship.
-private class RelationshipReplaceOperation<T: Resource, U: Resource>: RelationshipOperation {
+class RelationshipReplaceOperation<T: Resource, U: Relationship>: RelationshipOperation {
 	let resource: T
-	let relationship: Relationship<U>
+	let relationship: U
 
-	init(resource: T, relationship: Relationship<U>, spine: Spine) {
+	init(resource: T, relationship: U, spine: Spine) {
 		self.resource = resource
 		self.relationship = relationship
 		super.init()
@@ -407,36 +411,36 @@ private class RelationshipReplaceOperation<T: Resource, U: Resource>: Relationsh
 	
 	override func execute() {
 		let url = router.urlForRelationship(relationship, ofResource: resource)
-		let payload: Data
+		let payload: Data = try! relationship.serializeLinkData(for: resource)
 		
-		switch relationship {
-		case is ToOneRelationship:
-			payload = try! serializer.serializeLinkData(resource.value(forField: relationship.name) as? T)
-		case is ToManyRelationship:
-			let relatedResources = (resource.value(forField: relationship.name) as? ResourceCollection<T>)?.resources ?? []
-			payload = try! serializer.serializeLinkData(relatedResources)
-		default:
-			assertionFailure("Cannot only replace relationship contents for ToOneRelationship and ToManyRelationship")
-			return
-		}
+//		switch relationship {
+//		case is ToOneRelationship:
+//			payload = try! serializer.serializeLinkData(resource.value(forField: relationship.name) as? T)
+//		case is ToManyRelationship:
+//			let relatedResources = (resource.value(forField: relationship.name) as? ResourceCollection<T>)?.resources ?? []
+//			payload = try! serializer.serializeLinkData(relatedResources)
+//		default:
+//			assertionFailure("Cannot only replace relationship contents for ToOneRelationship and ToManyRelationship")
+//			return
+//		}
 
 		Spine.logInfo(.spine, "Replacing relationship \(relationship) using URL: \(url)")
 		networkClient.request(method: "PATCH", url: url, payload: payload, callback: handleNetworkResponse)
 	}
 }
 
-private enum Mutation {
+enum Mutation {
     case add, remove
 }
 
 /// A RelationshipMutateOperation mutates a to-many relationship by adding or removing linked resources.
-private class RelationshipMutateOperation<T: Resource>: RelationshipOperation {
+class RelationshipMutateOperation<T: Resource, U: Relationship>: RelationshipOperation {
 	
 	let resource: T
-	let relationship: ToManyRelationship
+	let relationship: U
 	let mutation: Mutation
 
-	init(resource: T, relationship: ToManyRelationship, mutation: Mutation, spine: Spine) {
+	init(resource: T, relationship: U, mutation: Mutation, spine: Spine) {
 		self.resource = resource
 		self.relationship = relationship
 		self.mutation = mutation
@@ -465,7 +469,8 @@ private class RelationshipMutateOperation<T: Resource>: RelationshipOperation {
 		}
 		
 		let url = router.urlForRelationship(relationship, ofResource: resource)
-		let payload = try! serializer.serializeLinkData(relatedResources)
+//		let payload = try! serializer.serializeLinkData(relatedResources)
+        let payload = try! relationship.serializeLinkData(for: resource)
 		Spine.logInfo(.spine, "Mutating relationship \(relationship) using URL: \(url)")
 		networkClient.request(method: httpMethod, url: url, payload: payload, callback: handleNetworkResponse)
 	}

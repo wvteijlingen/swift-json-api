@@ -72,6 +72,31 @@ public struct ResourceFactory {
 //        return resource
 //	}
 
+    func dispenseRaw(_ type: ResourceType, id: String, pool: inout [Resource], index: Int? = nil) throws -> Resource {
+//        guard let resourceType = resourceTypes[type] else {
+//            throw SerializerError.resourceTypeUnregistered(type)
+//        }
+
+        if let resource = (pool.filter { $0.resourceType == type && $0.id == id }.first) {
+            return resource
+        }
+
+        if !pool.isEmpty {
+            let applicableResources = (pool.filter { $0.resourceType == type })
+            if !applicableResources.isEmpty, let index = index {
+                if index < applicableResources.count {
+                    return applicableResources[index]
+                }
+            }
+
+        }
+
+        let resource = try self.instantiate(type)
+        resource.id = id
+        pool.append(resource)
+        return resource
+    }
+
     func dispense<T: Resource>(_ type: T.Type, id: String, pool: inout [Resource], index: Int? = nil) -> T {
 
         if let resource = (pool.filter { $0.resourceType == T.resourceType && $0.id == id }.first) as? T {

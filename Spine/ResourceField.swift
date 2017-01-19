@@ -81,6 +81,7 @@ public protocol Field {
                  fromResourcePool pool: inout [Resource],
                  withFactory factory: ResourceFactory)
     func resolve(for resource: Resource, withResourcePool pool: [Resource])
+    func updateOperations<T: Resource>(for resource: T, wihtSpine spine: Spine) -> [RelationshipOperation]
 }
 
 extension Field {
@@ -150,6 +151,10 @@ extension Attribute {
             let formattedValue = valueFormatters.unformatValue(value.rawValue, forAttribute: self)
             resource.setValue(formattedValue, forField: self.name)
         }
+    }
+
+    public func updateOperations<T: Resource>(for resource: T, wihtSpine spine: Spine) -> [RelationshipOperation] {
+        return []
     }
 }
 
@@ -281,14 +286,13 @@ public struct DateAttribute : Attribute {
 //    public init(_ type: T.Type) { }
 //}
 
-
-
-
-
 public protocol Relationship : Field {
+
     associatedtype Linked: Resource
     // XXX: create protocol that combines Resource and LinkedResourceCollection
 //    associatedtype ReturnValue
+
+    func serializeLinkData(for resource: Resource) throws -> Data
 
 }
 
@@ -315,6 +319,8 @@ extension Relationship {
         
         return RelationshipData(selfURL: selfURL, relatedURL: relatedURL, data: data)
     }
+
+
 }
 
 //public protocol ToOneRelationshipProtocol: Relationship {
@@ -409,6 +415,28 @@ public struct ToOneRelationship<T: Resource> : Relationship {
         }
     }
 
+    public func serializeLinkData(for resource: Resource) throws -> Data {
+        let relatedResource = resource.value(forField: self.name) as? Linked
+        let payloadData: Any
+
+        if let related = relatedResource {
+            assert(related.id != nil, "Attempt to convert resource without id to linkage. Only resources with ids can be converted to linkage.")
+            payloadData = ["type": related.resourceType, "id": related.id!]
+        } else {
+            payloadData = NSNull()
+        }
+
+        do {
+            return try JSONSerialization.data(withJSONObject: ["data": payloadData], options: JSONSerialization.WritingOptions(rawValue: 0))
+        } catch let error as NSError {
+            throw SerializerError.jsonSerializationError(error)
+        }
+    }
+
+    public func updateOperations<T: Resource>(for resource: T, wihtSpine spine: Spine) -> [RelationshipOperation] {
+        let operation = RelationshipReplaceOperation(resource: resource, relationship: self, spine: spine)
+        return [operation]
+    }
 }
 
 public struct ToManyRelationship<T: Resource> : Relationship {
@@ -508,6 +536,31 @@ public struct ToManyRelationship<T: Resource> : Relationship {
         }
     }
 
+    public func serializeLinkData(for resource: Resource) throws -> Data {
+        let relatedResources = (resource.value(forField: self.name) as? ResourceCollection<Linked>)?.resources ?? []
+        let payloadData: Any
+
+        if relatedResources.isEmpty {
+            payloadData = []
+        } else {
+            payloadData = relatedResources.map { r in
+                return ["type": r.resourceType, "id": r.id!]
+            }
+        }
+
+        do {
+            return try JSONSerialization.data(withJSONObject: ["data": payloadData], options: JSONSerialization.WritingOptions(rawValue: 0))
+        } catch let error as NSError {
+            throw SerializerError.jsonSerializationError(error)
+        }
+    }
+
+    public func updateOperations<T: Resource>(for resource: T, wihtSpine spine: Spine) -> [RelationshipOperation] {
+        let addOperation = RelationshipMutateOperation(resource: resource, relationship: self, mutation: .add, spine: spine)
+        let removeOperation = RelationshipMutateOperation(resource: resource, relationship: self, mutation: .remove, spine: spine)
+        return [addOperation, removeOperation]
+    }
+
 //    public func extractToManyRelationship(_ key: String, from serializedData: JSON) -> LinkedResourceCollection<Linked>? {
 //        var resourceCollection: LinkedResourceCollection<T>? = nil
 //
@@ -587,3 +640,5 @@ public struct ToManyRelationship<T: Resource> : Relationship {
 //        return resourceCollection
 //    }
 //}
+
+
