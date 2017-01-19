@@ -137,8 +137,13 @@ class DeserializeOperation: Operation {
 		resolveRelationships()
 		
 		// Create a result
-		var responseDocument = JSONAPIDocument(data: nil, included: nil, errors: extractedErrors, meta: extractedMeta, links: extractedLinks as [String : URL]?, jsonapi: extractedJSONAPI)
+//		var responseDocument = JSONAPIDocument(data: nil, included: nil, errors: extractedErrors, meta: extractedMeta, links: extractedLinks as [String : URL]?, jsonapi: extractedJSONAPI)
+        var responseDocument = JSONAPIDocument()
 		responseDocument.data = extractedPrimaryResources
+        responseDocument.errors = extractedErrors
+        responseDocument.meta = extractedMeta
+        responseDocument.links = extractedLinks
+        responseDocument.jsonapi = extractedJSONAPI
 		if !extractedIncludedResources.isEmpty {
 			responseDocument.included = extractedIncludedResources
 		}
