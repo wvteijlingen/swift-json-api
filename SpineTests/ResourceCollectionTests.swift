@@ -12,7 +12,7 @@ class ResourceCollectionTests: XCTestCase {
 
 	func testInitWithResourcesURLAndResources() {
 		let url = URL(string: "http://example.com/foos")!
-		let resources = [Foo(), Bar()]
+		let resources = [Foo(), Foo()] // 2nd was Bar
 		let collection = ResourceCollection(resources: resources, resourcesURL: url)
 		
 		XCTAssertNotNil(collection.resourcesURL, "Expected URL to be not nil.")
@@ -22,7 +22,7 @@ class ResourceCollectionTests: XCTestCase {
 	}
 	
 	func testIndexSubscript() {
-		let resources = [Foo(), Bar()]
+		let resources = [Foo(), Foo()] // 2nd was Bar
 		let collection = ResourceCollection(resources: resources)
 		
 		XCTAssert(collection[0] === resources[0], "Expected resource to be equal.")
@@ -30,7 +30,7 @@ class ResourceCollectionTests: XCTestCase {
 	}
 	
 	func testTypeAndIDSubscript() {
-		let resources = [Foo(id: "5"), Bar(id: "6")]
+		let resources = [Foo(id: "5"), Foo(id: "6")] // 2nd was Bar
 		let collection = ResourceCollection(resources: resources)
 		
 		XCTAssert(collection.resourceWithType("foos", id: "5")! === resources[0], "Expected resource to be equal.")
@@ -38,7 +38,7 @@ class ResourceCollectionTests: XCTestCase {
 	}
 	
 	func testCount() {
-		let resources = [Foo(), Bar()]
+		let resources = [Foo(), Foo()] // 2nd was Bar
 		let collection = ResourceCollection(resources: resources)
 		
 		XCTAssertEqual(collection.count, 2, "Expected count to be 2.")
@@ -46,7 +46,7 @@ class ResourceCollectionTests: XCTestCase {
 	
 	func testAppendResource() {
 		let foo = Foo(id: "1")
-		let collection = ResourceCollection(resources: [])
+		let collection = ResourceCollection<Foo>(resources: [])
 		
 		collection.appendResource(foo)
 		XCTAssertEqual(collection.resources, [foo], "Expected resources to be equal.")
@@ -90,7 +90,7 @@ class LinkedResourceCollectionTests: XCTestCase {
 	}
 	
 	func testAppendResource() {
-		let collection = LinkedResourceCollection(resourcesURL: nil, linkURL: nil, linkage: nil)
+		let collection = LinkedResourceCollection<Foo>(resourcesURL: nil, linkURL: nil, linkage: nil)
 		let foo = Foo(id: "1")
 		
 		collection.appendResource(foo)
@@ -101,7 +101,7 @@ class LinkedResourceCollectionTests: XCTestCase {
 	}
 	
 	func testLinkResource() {
-		let collection = LinkedResourceCollection(resourcesURL: nil, linkURL: nil, linkage: nil)
+		let collection = LinkedResourceCollection<Foo>(resourcesURL: nil, linkURL: nil, linkage: nil)
 		let foo = Foo(id: "1")
 		
 		collection.linkResource(foo)
@@ -111,7 +111,7 @@ class LinkedResourceCollectionTests: XCTestCase {
 	}
 
 	func testLinkUnlinked() {
-		let collection = LinkedResourceCollection(resourcesURL: nil, linkURL: nil, linkage: nil)
+		let collection = LinkedResourceCollection<Foo>(resourcesURL: nil, linkURL: nil, linkage: nil)
 		let foo = Foo(id: "1")
 
 		collection.appendResource(foo)
@@ -124,7 +124,7 @@ class LinkedResourceCollectionTests: XCTestCase {
 	}
 
 	func testUnlink() {
-		let collection = LinkedResourceCollection(resourcesURL: nil, linkURL: nil, linkage: nil)
+		let collection = LinkedResourceCollection<Foo>(resourcesURL: nil, linkURL: nil, linkage: nil)
 		let foo = Foo(id: "1")
 		
 		collection.appendResource(foo)
@@ -135,7 +135,7 @@ class LinkedResourceCollectionTests: XCTestCase {
 	}
 
 	func testUnlinkLinked() {
-		let collection = LinkedResourceCollection(resourcesURL: nil, linkURL: nil, linkage: nil)
+		let collection = LinkedResourceCollection<Foo>(resourcesURL: nil, linkURL: nil, linkage: nil)
 		let foo = Foo(id: "1")
 
 		collection.linkResource(foo)

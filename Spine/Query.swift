@@ -225,7 +225,7 @@ public struct Query<T: Resource> {
 	///
 	/// - parameter type:       The resource type for which to restrict the properties.
 	/// - parameter fieldNames: Names of fields to fetch.
-	public mutating func restrictFieldsOfResourceType(_ type: T.Type, to fieldNames: String...) {
+    public mutating func restrictFieldsOfResourceType<U: Resource>(_ type: U.Type, to fieldNames: String...) {
 		for fieldName in fieldNames {
 			guard let field = type.field(named: fieldName) else {
 				assertionFailure("Cannot restrict to field \(fieldName) of resource \(type.resourceType). No such field has been configured.")

@@ -126,17 +126,24 @@ public protocol Resource: class, NSObjectProtocol {  // NSCoding,
     init()
 }
 
-extension Resource where Self: NSObject {
+extension Resource {
 //    static var fields: [Field] {
 //        return []
 //    }
 
     var isLoaded: Bool {
+        // XXX ahh
         return false
     }
 
     var relationships: [String: RelationshipData] {
+        // XXX ahh
         return [:]
+    }
+
+    var meta: [String: Any]? {
+        // XXX ahh
+        return nil
     }
 
 //	public init() {
@@ -173,16 +180,6 @@ extension Resource where Self: NSObject {
 //		coder.encode(relationshipsData, forKey: "relationships")
 //	}
 
-    /// Returns the value for the field named `field`.
-	func value(forField field: String) -> Any? {
-		return value(forKey: field) as AnyObject?
-	}
-
-	/// Sets the value for the field named `field` to `value`.
-	func setValue(_ value: Any?, forField field: String) {
-		setValue(value, forKey: field)
-	}
-
 	/// Set the values for all fields to nil and sets `isLoaded` to false.
 	public func unload() {
         for field in Self.fields {
@@ -214,6 +211,18 @@ extension Resource where Self: NSObject {
 //                relatedResourceType = relationship.linkedType
 //            }
         return []
+    }
+}
+
+extension Resource where Self: NSObject {
+    /// Returns the value for the field named `field`.
+    func value(forField field: String) -> Any? {
+        return value(forKey: field) as AnyObject?
+    }
+
+    /// Sets the value for the field named `field` to `value`.
+    func setValue(_ value: Any?, forField field: String) {
+        setValue(value, forKey: field)
     }
 }
 
