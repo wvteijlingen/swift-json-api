@@ -125,7 +125,7 @@ extension ResourceCollection: Sequence {
 /// This allows Spine to make partial updates to the collection when it the parent resource is persisted.
 public class LinkedResourceCollection<T: Resource>: ResourceCollection<T> {
 	/// The type/id pairs of resources present in this link.
-	public var linkage: [ResourceIdentifier]?
+	public var linkage: [ResourceIdentifier<T>]?
 	
 	/// The URL of the link object of this collection.
 	public var linkURL: URL?
@@ -136,7 +136,7 @@ public class LinkedResourceCollection<T: Resource>: ResourceCollection<T> {
 	/// Resources removed from this linked collection, but not yet persisted.
 	public internal(set) var removedResources: [T] = []
 	
-	public init(resourcesURL: URL?, linkURL: URL?, linkage: [ResourceIdentifier]?) {
+	public init(resourcesURL: URL?, linkURL: URL?, linkage: [ResourceIdentifier<T>]?) {
 		super.init(resources: [], resourcesURL: resourcesURL)
 		self.linkURL = linkURL
 		self.linkage = linkage

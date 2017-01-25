@@ -305,19 +305,21 @@ extension Relationship {
     func extractRelationshipData(_ linkData: JSON) -> RelationshipData {
         let selfURL = linkData["links"]["self"].URL
         let relatedURL = linkData["links"]["related"].URL
-        let data: [ResourceIdentifier]?
+        let data: [ResourceIdentifier<Linked>]?
 
         if let toOne = linkData["data"].dictionary {
-            data = [ResourceIdentifier(type: toOne["type"]!.stringValue, id: toOne["id"]!.stringValue)]
+            // XXX: assert ["type"]!.stringValue == Linked.resourceType
+            data = [ResourceIdentifier(type: Linked.self, id: toOne["id"]!.stringValue)]
         } else if let toMany = linkData["data"].array {
-            data = toMany.map { JSON -> ResourceIdentifier in
-                return ResourceIdentifier(type: JSON["type"].stringValue, id: JSON["id"].stringValue)
+            data = toMany.map { JSON -> ResourceIdentifier<Linked> in
+                // XXX: assert ["type"]!.stringValue == Linked.resourceType
+                return ResourceIdentifier(type: Linked.self, id: JSON["id"].stringValue)
             }
         } else {
             data = nil
         }
         
-        return RelationshipData(selfURL: selfURL, relatedURL: relatedURL, data: data)
+        return TypedRelationshipData(selfURL: selfURL, relatedURL: relatedURL, data: data)
     }
 
 
@@ -462,11 +464,11 @@ public struct ToManyRelationship<T: Resource> : Relationship {
 
         if options.contains(.IncludeToMany) {
             let linkedResources = resource.value(forField: self.name) as? ResourceCollection<Linked>
-            var resourceIdentifiers: [ResourceIdentifier] = []
+            var resourceIdentifiers: [ResourceIdentifier<T>] = []
 
             if let resources = linkedResources?.resources {
                 resourceIdentifiers = resources.filter { $0.id != nil }.map { resource in
-                    return ResourceIdentifier(type: resource.resourceType, id: resource.id!)
+                    return ResourceIdentifier(type: T.self, id: resource.id!)
                 }
             }
 
@@ -501,7 +503,8 @@ public struct ToManyRelationship<T: Resource> : Relationship {
             let linkURL: URL? = linkData["links"]?["self"].URL
 
             if let linkage = linkData["data"]?.array {
-                let mappedLinkage = linkage.map { ResourceIdentifier(type: $0["type"].stringValue, id: $0["id"].stringValue) }
+                // XXX: assert  $0["type"].stringValue == T.resourceType
+                let mappedLinkage = linkage.map { ResourceIdentifier(type: T.self, id: $0["id"].stringValue) }
                 resourceCollection = LinkedResourceCollection<T>(resourcesURL: resourcesURL, linkURL: linkURL, linkage: mappedLinkage)
             } else {
                 resourceCollection = LinkedResourceCollection<T>(resourcesURL: resourcesURL, linkURL: linkURL, linkage: nil)

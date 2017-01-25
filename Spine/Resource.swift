@@ -11,16 +11,16 @@ import Foundation
 public typealias ResourceType = String
 
 /// A ResourceIdentifier uniquely identifies a resource that exists on the server.
-public struct ResourceIdentifier: Equatable {
+public struct ResourceIdentifier<T: Resource> : Equatable {
 	/// The resource type.
 	var type: ResourceType
 	
 	/// The resource ID.
-	var id: String
+	public var id: String
 
 	/// Constructs a new ResourceIdentifier instance with given `type` and `id`.
-	init(type: ResourceType, id: String) {
-		self.type = type
+	init(type: T.Type, id: String) {
+		self.type = type.resourceType
 		self.id = id
 	}
 
@@ -32,22 +32,27 @@ public struct ResourceIdentifier: Equatable {
 	}
 
 	/// Returns a dictionary with "type" and "id" keys containing the type and id.
-	func toDictionary() -> NSDictionary {
+	public func toDictionary() -> NSDictionary {
 		return ["type": type, "id": id]
 	}
 }
 
-public func ==(lhs: ResourceIdentifier, rhs: ResourceIdentifier) -> Bool {
-	return lhs.type == rhs.type && lhs.id == rhs.id
+public func ==<T: Resource>(lhs: ResourceIdentifier<T>, rhs: ResourceIdentifier<T>) -> Bool {
+	return lhs.id == rhs.id
 }
 
+public protocol RelationshipData {
+    var selfURL: URL? { get }
+}
+
+
 /// A RelationshipData struct holds data about a relationship.
-public struct RelationshipData {
-	var selfURL: URL?
+public struct TypedRelationshipData<T: Resource> : RelationshipData {
+	public var selfURL: URL?
 	var relatedURL: URL?
-	var data: [ResourceIdentifier]?
+	var data: [ResourceIdentifier<T>]?
 	
-	init(selfURL: URL?, relatedURL: URL?, data: [ResourceIdentifier]?) {
+	init(selfURL: URL?, relatedURL: URL?, data: [ResourceIdentifier<T>]?) {
 		self.selfURL = selfURL
 		self.relatedURL = relatedURL
 		self.data = data
@@ -58,8 +63,11 @@ public struct RelationshipData {
 	init(dictionary: NSDictionary) {
 		selfURL = dictionary["selfURL"] as? URL
 		relatedURL = dictionary["relatedURL"] as? URL
-		data = (dictionary["data"] as? [NSDictionary])?.map(ResourceIdentifier.init)
-	}
+        data = (dictionary["data"] as? [[String: String]])?.map { d in
+            return ResourceIdentifier(type: T.self, id: d["id"]!) // XXX force unwrap
+        }
+
+}
 	
 	/// Returns a dictionary with "type" and "id" keys containing the type and id.
 	func toDictionary() -> NSDictionary {
@@ -104,6 +112,7 @@ public protocol Resource: class, NSObjectProtocol {  // NSCoding,
 	/// Raw relationship data keyed by relationship name.
     var relationships: [String: RelationshipData] { get set }
 
+    // XXX: don't remove
 //    var description: String { get }
 //    var debugDescription: String { get }
 

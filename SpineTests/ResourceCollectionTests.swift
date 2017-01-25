@@ -59,7 +59,7 @@ class LinkedResourceCollectionTests: XCTestCase {
 	func testInitWithResourcesURLAndURLAndLinkage() {
 		let resourcesURL = URL(string: "http://example.com/foos")!
 		let linkURL = URL(string: "http://example.com/bars/1/link/foos")!
-		let linkage = [ResourceIdentifier(type: "foos", id: "1"), ResourceIdentifier(type: "bars", id: "2")]
+		let linkage = [ResourceIdentifier(type: Foo.self, id: "1"), ResourceIdentifier(type: Foo.self, id: "2")] // 2nd was  ResourceIdentifier(type: "bars", id: "2")
 		let collection = LinkedResourceCollection(resourcesURL: resourcesURL, linkURL: linkURL, linkage: linkage)
 		
 		XCTAssertNotNil(collection.resourcesURL, "Expected resources URL to be not nil.")
@@ -76,7 +76,8 @@ class LinkedResourceCollectionTests: XCTestCase {
 	func testInitWithResourcesURLAndURLAndHomogenousTypeAndLinkage() {
 		let resourcesURL = URL(string: "http://example.com/foos")!
 		let linkURL = URL(string: "http://example.com/bars/1/link/foos")!
-		let collection = LinkedResourceCollection(resourcesURL: resourcesURL, linkURL: linkURL, linkage: ["1", "2"].map { ResourceIdentifier(type: "foos", id: $0) })
+        let linkage = ["1", "2"].map { ResourceIdentifier(type: Foo.self, id: $0) }
+		let collection = LinkedResourceCollection(resourcesURL: resourcesURL, linkURL: linkURL, linkage: linkage)
 		
 		XCTAssertNotNil(collection.resourcesURL, "Expected resources URL to be not nil.")
 		XCTAssertEqual(collection.resourcesURL!, resourcesURL, "Expected resources URL to be equal.")
@@ -85,8 +86,8 @@ class LinkedResourceCollectionTests: XCTestCase {
 		XCTAssertEqual(collection.linkURL!, linkURL, "Expected link URL to be equal.")
 		
 		XCTAssert(collection.linkage != nil, "Expected linkage to be not nil.")
-		XCTAssertEqual(collection.linkage![0], ResourceIdentifier(type: "foos", id: "1"), "Expected first linkage item to be equal.")
-		XCTAssertEqual(collection.linkage![1], ResourceIdentifier(type: "foos", id: "2"), "Expected second linkage item to be equal.")
+		XCTAssertEqual(collection.linkage![0], ResourceIdentifier(type: Foo.self, id: "1"), "Expected first linkage item to be equal.")
+		XCTAssertEqual(collection.linkage![1], ResourceIdentifier(type: Foo.self, id: "2"), "Expected second linkage item to be equal.")
 	}
 	
 	func testAppendResource() {
