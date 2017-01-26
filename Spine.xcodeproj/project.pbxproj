@@ -82,6 +82,10 @@
 		24E6DF751D6831520072D4DC /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24E6DF721D6831520072D4DC /* SwiftyJSON.framework */; };
 		24EA5DB11D2D39A700F3E867 /* SingleFooWithUnregisteredType.json in Resources */ = {isa = PBXBuildFile; fileRef = 24EA5DB01D2D39A100F3E867 /* SingleFooWithUnregisteredType.json */; };
 		24EA5DB21D2D39A800F3E867 /* SingleFooWithUnregisteredType.json in Resources */ = {isa = PBXBuildFile; fileRef = 24EA5DB01D2D39A100F3E867 /* SingleFooWithUnregisteredType.json */; };
+		509BB46A1E3A8F25001FC417 /* Reflection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 509BB4691E3A8F25001FC417 /* Reflection.framework */; };
+		509BB46C1E3A8F2C001FC417 /* Reflection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 509BB46B1E3A8F2C001FC417 /* Reflection.framework */; };
+		509BB46E1E3A8F31001FC417 /* Reflection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 509BB46D1E3A8F31001FC417 /* Reflection.framework */; };
+		509BB4701E3A8F36001FC417 /* Reflection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 509BB46F1E3A8F36001FC417 /* Reflection.framework */; };
 		D302A6531DA13BAF00420C48 /* Spine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D373F7A319B224BB00275AFC /* Spine.swift */; };
 		D302A6541DA13BAF00420C48 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = D331836B19B2302500936FBB /* Query.swift */; };
 		D302A6551DA13BAF00420C48 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3452C2E1AD18E6900CD413B /* Operation.swift */; };
@@ -228,6 +232,10 @@
 		24E6DF711D6831520072D4DC /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Result.framework; path = Carthage/Build/Mac/Result.framework; sourceTree = "<group>"; };
 		24E6DF721D6831520072D4DC /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
 		24EA5DB01D2D39A100F3E867 /* SingleFooWithUnregisteredType.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = SingleFooWithUnregisteredType.json; sourceTree = "<group>"; };
+		509BB4691E3A8F25001FC417 /* Reflection.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reflection.framework; path = "Reflection/build/Debug-iphoneos/Reflection.framework"; sourceTree = "<group>"; };
+		509BB46B1E3A8F2C001FC417 /* Reflection.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reflection.framework; path = "Reflection/build/Debug-iphoneos/Reflection.framework"; sourceTree = "<group>"; };
+		509BB46D1E3A8F31001FC417 /* Reflection.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reflection.framework; path = "Reflection/build/Debug-iphoneos/Reflection.framework"; sourceTree = "<group>"; };
+		509BB46F1E3A8F36001FC417 /* Reflection.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reflection.framework; path = "Reflection/build/Debug-iphoneos/Reflection.framework"; sourceTree = "<group>"; };
 		D307FBED1A97756700EE0FAC /* SingleFooIncludingBars.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = SingleFooIncludingBars.json; sourceTree = "<group>"; };
 		D312E2F719BB83A8004BB3E0 /* SerializingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializingTests.swift; sourceTree = "<group>"; };
 		D32EA6DC1BCBD5930076CFA5 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Result.framework; path = Carthage/Build/iOS/Result.framework; sourceTree = "<group>"; };
@@ -279,6 +287,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				509BB46C1E3A8F2C001FC417 /* Reflection.framework in Frameworks */,
 				240BCA761CD930BE00842222 /* Result.framework in Frameworks */,
 				240BCA781CD930C700842222 /* BrightFutures.framework in Frameworks */,
 				240BCA7A1CD930CD00842222 /* SwiftyJSON.framework in Frameworks */,
@@ -299,6 +308,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				509BB46E1E3A8F31001FC417 /* Reflection.framework in Frameworks */,
 				24E6DF731D6831520072D4DC /* BrightFutures.framework in Frameworks */,
 				24E6DF741D6831520072D4DC /* Result.framework in Frameworks */,
 				24E6DF751D6831520072D4DC /* SwiftyJSON.framework in Frameworks */,
@@ -320,6 +330,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				509BB46A1E3A8F25001FC417 /* Reflection.framework in Frameworks */,
 				D32EA6DD1BCBD5930076CFA5 /* Result.framework in Frameworks */,
 				D32EA6DA1BCBD5930076CFA5 /* BrightFutures.framework in Frameworks */,
 				D32EA6DB1BCBD5930076CFA5 /* SwiftyJSON.framework in Frameworks */,
@@ -340,6 +351,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				509BB4701E3A8F36001FC417 /* Reflection.framework in Frameworks */,
 				D398E1631DA1562E00FBC6FD /* BrightFutures.framework in Frameworks */,
 				D398E1641DA1562E00FBC6FD /* Result.framework in Frameworks */,
 				D398E1651DA1562E00FBC6FD /* SwiftyJSON.framework in Frameworks */,
@@ -362,6 +374,10 @@
 		245B5DD41CD92E3200E44FBE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				509BB46F1E3A8F36001FC417 /* Reflection.framework */,
+				509BB46D1E3A8F31001FC417 /* Reflection.framework */,
+				509BB46B1E3A8F2C001FC417 /* Reflection.framework */,
+				509BB4691E3A8F25001FC417 /* Reflection.framework */,
 				D398E15F1DA1561400FBC6FD /* watchOS */,
 				24E6DF6F1D6831280072D4DC /* macOS */,
 				245B5DD51CD92E3900E44FBE /* iOS */,
@@ -1062,6 +1078,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+					"$(PROJECT_DIR)/Reflection/build/Debug-iphoneos",
 				);
 				INFOPLIST_FILE = Spine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1085,6 +1102,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+					"$(PROJECT_DIR)/Reflection/build/Debug-iphoneos",
 				);
 				INFOPLIST_FILE = Spine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1150,6 +1168,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Reflection/build/Debug-iphoneos",
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1179,6 +1198,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Reflection/build/Debug-iphoneos",
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1343,6 +1363,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Reflection/build/Debug-iphoneos",
 				);
 				INFOPLIST_FILE = Spine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1367,6 +1388,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Reflection/build/Debug-iphoneos",
 				);
 				INFOPLIST_FILE = Spine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1430,6 +1452,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/watchOS",
+					"$(PROJECT_DIR)/Reflection/build/Debug-iphoneos",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Spine/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1462,6 +1485,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/watchOS",
+					"$(PROJECT_DIR)/Reflection/build/Debug-iphoneos",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Spine/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
