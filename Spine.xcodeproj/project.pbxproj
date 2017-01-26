@@ -1549,6 +1549,7 @@
 				D398E14E1DA1554300FBC6FD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

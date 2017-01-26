@@ -303,8 +303,8 @@ extension Relationship {
 
 
     func extractRelationshipData(_ linkData: JSON) -> RelationshipData {
-        let selfURL = linkData["links"]["self"].URL
-        let relatedURL = linkData["links"]["related"].URL
+        let selfURL = linkData["links"]["self"].url
+        let relatedURL = linkData["links"]["related"].url
         let data: [ResourceIdentifier<Linked>]?
 
         if let toOne = linkData["data"].dictionary {
@@ -405,7 +405,7 @@ public struct ToOneRelationship<T: Resource> : Relationship {
                 linkedResource = Linked.init()
             }
 
-            if let resourceURL = linkData["links"]?["related"].URL {
+            if let resourceURL = linkData["links"]?["related"].url {
                 linkedResource!.url = resourceURL
             }
         }
@@ -499,8 +499,8 @@ public struct ToManyRelationship<T: Resource> : Relationship {
         var resourceCollection: LinkedResourceCollection<T>? = nil
 
         if let linkData = serializedData["relationships"][key].dictionary {
-            let resourcesURL: URL? = linkData["links"]?["related"].URL
-            let linkURL: URL? = linkData["links"]?["self"].URL
+            let resourcesURL: URL? = linkData["links"]?["related"].url
+            let linkURL: URL? = linkData["links"]?["self"].url
 
             if let linkage = linkData["data"]?.array {
                 // XXX: assert  $0["type"].stringValue == T.resourceType
