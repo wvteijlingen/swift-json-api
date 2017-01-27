@@ -317,6 +317,7 @@ class DeserializeOperation: Operation {
 //		return resourceCollection
 //	}
 
+
 	/// Extract the relationship data from the given JSON.
 	///
 	/// - parameter linkData: The JSON from which to extract relationship data.
