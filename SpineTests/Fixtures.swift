@@ -12,7 +12,7 @@ import SwiftyJSON
 
 class Foo: NSObject, Resource {
     /// Raw relationship data keyed by relationship name.
-    public var relationships: [String : RelationshipData]
+    public var relationships: [String : RelationshipData] = [:]
 
     /// The metadata for this resource.
     public var meta: [String : Any]?
@@ -23,7 +23,7 @@ class Foo: NSObject, Resource {
 
     var id: String?
     var url: URL?
-    var isLoaded: Bool
+    var isLoaded: Bool = false
 
 	var stringAttribute: String?
 	var integerAttribute: NSNumber?
@@ -63,7 +63,7 @@ class Foo: NSObject, Resource {
 
 class Bar: NSObject, Resource {
     /// Raw relationship data keyed by relationship name.
-    public var relationships: [String : RelationshipData]
+    public var relationships: [String : RelationshipData] = [:]
 
     /// The metadata for this resource.
     public var meta: [String : Any]?
@@ -74,7 +74,7 @@ class Bar: NSObject, Resource {
 
     var id: String?
     var url: URL?
-    var isLoaded: Bool
+    var isLoaded: Bool = false
 
 	var barStringAttribute: String?
 	var barIntegerAttribute: NSNumber?
