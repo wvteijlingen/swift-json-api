@@ -411,7 +411,7 @@ class RelationshipReplaceOperation<T: Resource, U: Relationship>: RelationshipOp
 	
 	override func execute() {
 		let url = router.urlForRelationship(relationship, ofResource: resource)
-		let payload: Data = try! relationship.serializeLinkData(for: resource)
+        let payload: Data = try! relationship.serializeLinkData(for: resource, with: serializer)
 		
 //		switch relationship {
 //		case is ToOneRelationship:
@@ -449,9 +449,9 @@ class RelationshipMutateOperation<T: Resource, U: Relationship>: RelationshipOpe
 	}
 
 	override func execute() {
-		let resourceCollection = resource.value(forField: relationship.name) as! LinkedResourceCollection<T>
+		let resourceCollection = resource.value(forField: relationship.name) as! LinkedResourceCollection<U.Linked>
 		let httpMethod: String
-		let relatedResources: [T]
+		let relatedResources: [U.Linked]
 		
 		switch mutation {
 		case .add:
@@ -469,8 +469,7 @@ class RelationshipMutateOperation<T: Resource, U: Relationship>: RelationshipOpe
 		}
 		
 		let url = router.urlForRelationship(relationship, ofResource: resource)
-//		let payload = try! serializer.serializeLinkData(relatedResources)
-        let payload = try! relationship.serializeLinkData(for: resource)
+		let payload = try! serializer.serializeLinkData(relatedResources)
 		Spine.logInfo(.spine, "Mutating relationship \(relationship) using URL: \(url)")
 		networkClient.request(method: httpMethod, url: url, payload: payload, callback: handleNetworkResponse)
 	}

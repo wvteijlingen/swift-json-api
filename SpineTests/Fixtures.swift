@@ -11,19 +11,11 @@ import XCTest
 import SwiftyJSON
 
 class Foo: NSObject, Resource {
-    /// Raw relationship data keyed by relationship name.
-    public var relationships: [String : RelationshipData] = [:]
-
-    /// The metadata for this resource.
-    public var meta: [String : Any]?
+    var resourceData = ResourceData()
 
     public override required init() {
 
     }
-
-    var id: String?
-    var url: URL?
-    var isLoaded: Bool = false
 
 	var stringAttribute: String?
 	var integerAttribute: NSNumber?
@@ -62,19 +54,11 @@ class Foo: NSObject, Resource {
 }
 
 class Bar: NSObject, Resource {
-    /// Raw relationship data keyed by relationship name.
-    public var relationships: [String : RelationshipData] = [:]
-
-    /// The metadata for this resource.
-    public var meta: [String : Any]?
+    var resourceData = ResourceData()
 
     public override required init() {
 
     }
-
-    var id: String?
-    var url: URL?
-    var isLoaded: Bool = false
 
 	var barStringAttribute: String?
 	var barIntegerAttribute: NSNumber?

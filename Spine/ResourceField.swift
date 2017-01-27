@@ -164,7 +164,7 @@ public struct PlainAttribute : Attribute {
     public var serializedName: String
     public var isReadOnly: Bool = false
 
-    init(_ name: String) {
+    public init(_ name: String) {
         self.name = name
         self.serializedName = name
     }
@@ -175,7 +175,7 @@ public struct BooleanAttribute : Attribute {
     public var serializedName: String
     public var isReadOnly: Bool = false
 
-    init(_ name: String) {
+    public init(_ name: String) {
         self.name = name
         self.serializedName = name
     }
@@ -187,7 +187,7 @@ public struct URLAttribute : Attribute {
     public var isReadOnly: Bool = false
     public let baseURL: URL?
 
-    init(_ name: String, for url: URL? = nil) {
+    public init(_ name: String, for url: URL? = nil) {
         self.name = name
         self.serializedName = name
         self.baseURL = url
@@ -200,7 +200,7 @@ public struct DateAttribute : Attribute {
     public var isReadOnly: Bool = false
     public let format: String
 
-    init(_ name: String, format: String = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ") {
+    public init(_ name: String, format: String = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ") {
         self.name = name
         self.serializedName = name
         self.format = format
@@ -292,7 +292,7 @@ public protocol Relationship : Field {
     // XXX: create protocol that combines Resource and LinkedResourceCollection
 //    associatedtype ReturnValue
 
-    func serializeLinkData(for resource: Resource) throws -> Data
+    func serializeLinkData(for resource: Resource, with serializer: Serializer) throws -> Data
 
 }
 
@@ -343,7 +343,7 @@ public struct ToOneRelationship<T: Resource> : Relationship {
     public var serializedName: String
     public var isReadOnly: Bool = false
 
-    init(_ name: String, to linkedType: T.Type) {
+    public init(_ name: String, to linkedType: T.Type) {
         self.name = name
         self.serializedName = name
     }
@@ -397,7 +397,7 @@ public struct ToOneRelationship<T: Resource> : Relationship {
         var linkedResource: T? = nil
 
         if let linkData = serializedData["relationships"][key].dictionary {
-            assert(linkData["data"]?["type"].string == Linked.resourceType)
+            // XXX: assert(linkData["data"]?["type"].string == Linked.resourceType)
 
             if let id = linkData["data"]?["id"].string {
                 linkedResource = factory.dispense(Linked.self, id: id, pool: &pool)
@@ -411,28 +411,15 @@ public struct ToOneRelationship<T: Resource> : Relationship {
         }
         
         if let linkedResource = linkedResource {
-            if linkedResource.value(forField: self.name) == nil || (linkedResource.value(forField: self.name) as? Resource)?.isLoaded == false {
-                linkedResource.setValue(linkedResource, forField: self.name)
+            if resource.value(forField: self.name) == nil || (resource.value(forField: self.name) as? Resource)?.isLoaded == false {
+                resource.setValue(linkedResource, forField: self.name)
             }
         }
     }
 
-    public func serializeLinkData(for resource: Resource) throws -> Data {
+    public func serializeLinkData(for resource: Resource, with serializer: Serializer) throws -> Data {
         let relatedResource = resource.value(forField: self.name) as? Linked
-        let payloadData: Any
-
-        if let related = relatedResource {
-            assert(related.id != nil, "Attempt to convert resource without id to linkage. Only resources with ids can be converted to linkage.")
-            payloadData = ["type": related.resourceType, "id": related.id!]
-        } else {
-            payloadData = NSNull()
-        }
-
-        do {
-            return try JSONSerialization.data(withJSONObject: ["data": payloadData], options: JSONSerialization.WritingOptions(rawValue: 0))
-        } catch let error as NSError {
-            throw SerializerError.jsonSerializationError(error)
-        }
+        return try serializer.serializeLinkData(relatedResource)
     }
 
     public func updateOperations<T: Resource>(for resource: T, wihtSpine spine: Spine) -> [RelationshipOperation] {
@@ -448,7 +435,7 @@ public struct ToManyRelationship<T: Resource> : Relationship {
     public var serializedName: String
     public var isReadOnly: Bool = false
 
-    init(_ name: String, to linkedType: T.Type) {
+    public init(_ name: String, to linkedType: T.Type) {
         self.name = name
         self.serializedName = name
     }
@@ -539,23 +526,9 @@ public struct ToManyRelationship<T: Resource> : Relationship {
         }
     }
 
-    public func serializeLinkData(for resource: Resource) throws -> Data {
+    public func serializeLinkData(for resource: Resource, with serializer: Serializer) throws -> Data {
         let relatedResources = (resource.value(forField: self.name) as? ResourceCollection<Linked>)?.resources ?? []
-        let payloadData: Any
-
-        if relatedResources.isEmpty {
-            payloadData = []
-        } else {
-            payloadData = relatedResources.map { r in
-                return ["type": r.resourceType, "id": r.id!]
-            }
-        }
-
-        do {
-            return try JSONSerialization.data(withJSONObject: ["data": payloadData], options: JSONSerialization.WritingOptions(rawValue: 0))
-        } catch let error as NSError {
-            throw SerializerError.jsonSerializationError(error)
-        }
+        return try serializer.serializeLinkData(relatedResources)
     }
 
     public func updateOperations<T: Resource>(for resource: T, wihtSpine spine: Spine) -> [RelationshipOperation] {

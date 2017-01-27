@@ -76,13 +76,8 @@ public class ResourceCollection<T: Resource>: NSObject, NSCoding {
 	public var count: Int {
 		return resources.count
 	}
-	
-	/// Returns a resource identified by the given type and id,
-	/// or nil if no resource was found.
-	public func resourceWithType(_ type: ResourceType, id: String) -> T? {
-		return resources.filter { $0.id == id && $0.resourceType == type }.first
-	}
-	
+
+
 	// MARK: Mutators
 	
 	/// Append `resource` to the collection.

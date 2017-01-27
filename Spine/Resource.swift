@@ -130,6 +130,9 @@ public protocol Resource: class, NSObjectProtocol {  // NSCoding,
     /// Returns the field named `name`, or nil if no such field exists.
     static func field(named name: String) -> Field?
 
+    // XXX: Combines id url isLoaded ...
+    var resourceData: ResourceData { get set }
+
     /// XXX: New stuff
     static func includeKeys(_ keys: [String], with formatter: KeyFormatter) -> [String]
 
@@ -141,19 +144,74 @@ extension Resource {
 //        return []
 //    }
 
+    public var id: String? {
+        get {
+            return self.resourceData.id
+        }
+        set {
+            self.resourceData.id = newValue
+        }
+    }
+
+    var url: URL? {
+        get {
+            return self.resourceData.url
+        }
+        set {
+            self.resourceData.url = newValue
+        }
+    }
+
     var isLoaded: Bool {
-        // XXX ahh
-        return false
+        get {
+            return self.resourceData.isLoaded
+        }
+        set {
+            self.resourceData.isLoaded = newValue
+        }
     }
 
     var relationships: [String: RelationshipData] {
-        // XXX ahh
-        return [:]
+        get {
+            return self.resourceData.relationships
+        }
+        set {
+            self.resourceData.relationships = newValue
+        }
     }
 
     var meta: [String: Any]? {
-        // XXX ahh
-        return nil
+        get {
+            return self.resourceData.meta
+        }
+        set {
+            self.resourceData.meta = newValue
+        }
+    }
+
+    /// Returns the value for the field named `field`.
+    func value(forField field: String) -> Any? {
+        do {
+            return try get(field, from: self)
+        } catch {
+            // XXX: throw error
+            fatalError("Can't get value for field '\(field)'")
+        }
+    }
+
+    /// Sets the value for the field named `field` to `value`.
+    func setValue(_ value: Any?, forField field: String) {
+        unowned var unownedSelf = self
+        do {
+            if let value = value {
+                try set(value, key: field, for: &unownedSelf)
+            } else {
+                try set(NSNull(), key: field, for: &unownedSelf)
+            }
+        } catch {
+            // XXX: throw error
+            fatalError("Can't set value '\(value)' for field '\(field)'")
+        }
     }
 
 //	public init() {
@@ -224,17 +282,17 @@ extension Resource {
     }
 }
 
-extension Resource where Self: NSObject {
-    /// Returns the value for the field named `field`.
-    func value(forField field: String) -> Any? {
-        return value(forKey: field) as AnyObject?
-    }
-
-    /// Sets the value for the field named `field` to `value`.
-    func setValue(_ value: Any?, forField field: String) {
-        setValue(value, forKey: field)
-    }
-}
+//extension Resource where Self: NSObject {
+//    /// Returns the value for the field named `field`.
+//    func value(forField field: String) -> Any? {
+//        return value(forKey: field) as AnyObject?
+//    }
+//
+//    /// Sets the value for the field named `field` to `value`.
+//    func setValue(_ value: Any?, forField field: String) {
+//        setValue(value, forKey: field)
+//    }
+//}
 
 extension Resource {
 //	var description: String {
@@ -254,4 +312,17 @@ extension Resource {
 
 public func == <T: Resource> (left: T, right: T) -> Bool {
     return (left.id == right.id) && (left.resourceType == right.resourceType)
+}
+
+public struct ResourceData {
+    var id: String?
+    var url: URL?
+    var isLoaded: Bool
+    var meta: [String : Any]?
+    var relationships: [String : RelationshipData]
+
+    public init() {
+        self.isLoaded = false
+        self.relationships = [:]
+    }
 }

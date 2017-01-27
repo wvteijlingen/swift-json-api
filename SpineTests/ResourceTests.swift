@@ -53,23 +53,24 @@ class ResourceTests: XCTestCase {
 		foo.setValue("newStringValue", forField: "stringAttribute")
 		
 	}
-	
-	func testEncoding() {
-		foo.url = URL(string: "http://example.com/api/foos/1")
-		foo.isLoaded = true
-		
-		let encodedData = NSKeyedArchiver.archivedData(withRootObject: foo)
-		let decodedFoo: AnyObject? = NSKeyedUnarchiver.unarchiveObject(with: encodedData) as AnyObject?
-		
-		XCTAssertNotNil(decodedFoo, "Expected decoded object to be not nil")
-		XCTAssert(decodedFoo is Foo, "Expected decoded object to be of type 'Foo'")
-		
-		if let decodedFoo = decodedFoo as? Foo {
-			XCTAssertEqual(decodedFoo.id!, foo.id!, "Expected id to be equal")
-			XCTAssertEqual(decodedFoo.url!, foo.url!, "Expected URL to be equal")
-			XCTAssertEqual(decodedFoo.isLoaded, foo.isLoaded, "Expected isLoaded to be equal")
-		} else {
-			XCTFail("Fail")
-		}
-	}
+
+    // XXX remove: dont suppert NSCoding
+//	func testEncoding() {
+//		foo.url = URL(string: "http://example.com/api/foos/1")
+//		foo.isLoaded = true
+//		
+//		let encodedData = NSKeyedArchiver.archivedData(withRootObject: foo)
+//		let decodedFoo: AnyObject? = NSKeyedUnarchiver.unarchiveObject(with: encodedData) as AnyObject?
+//		
+//		XCTAssertNotNil(decodedFoo, "Expected decoded object to be not nil")
+//		XCTAssert(decodedFoo is Foo, "Expected decoded object to be of type 'Foo'")
+//		
+//		if let decodedFoo = decodedFoo as? Foo {
+//			XCTAssertEqual(decodedFoo.id!, foo.id!, "Expected id to be equal")
+//			XCTAssertEqual(decodedFoo.url!, foo.url!, "Expected URL to be equal")
+//			XCTAssertEqual(decodedFoo.isLoaded, foo.isLoaded, "Expected isLoaded to be equal")
+//		} else {
+//			XCTFail("Fail")
+//		}
+//	}
 }
