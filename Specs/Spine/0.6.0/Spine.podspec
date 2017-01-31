@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.authors = { 'Ward van Teijlingen' => 'w.van.teijlingen@gmail.com' }
   s.source = { :git => 'https://github.com/DNI-Mercury/Spine.git', :tag => s.version }
 
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '8.0'
   s.tvos.deployment_target = '9.0'
   s.osx.deployment_target = '10.10'
 
