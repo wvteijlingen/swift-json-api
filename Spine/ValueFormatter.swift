@@ -133,13 +133,16 @@ struct ValueFormatterRegistry {
 /// If a baseURL has been configured in the URLAttribute, and the given String is not an absolute URL,
 /// it will return an absolute URL, relative to the baseURL.
 private struct URLValueFormatter: ValueFormatter {
-	func unformatValue(_ value: String, forAttribute attribute: URLAttribute) -> URL {
-		return URL(string: value, relativeTo: attribute.baseURL as URL?)!
-	}
-	
-	func formatValue(_ value: URL, forAttribute attribute: URLAttribute) -> String {
-		return value.absoluteString
-	}
+    func unformatValue(_ value: String?, forAttribute attribute: URLAttribute) -> URL? {
+        guard let value = value else {
+            return nil
+        }
+        return URL(string: value, relativeTo: attribute.baseURL)
+    }
+    
+    func formatValue(_ value: URL?, forAttribute attribute: URLAttribute) -> String? {
+        return value?.absoluteString
+    }
 }
 
 /// DateValueFormatter is a value formatter that transforms between NSDate and String, and vice versa.
