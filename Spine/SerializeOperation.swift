@@ -135,20 +135,23 @@ class SerializeOperation: Operation {
 			serializedId = NSNull()
 		}
 		
-		let serializedRelationship = [
-			"data": [
-				"type": type,
-				"id": serializedId
-			]
-		]
-		
-		if serializedData["relationships"] == nil {
-			serializedData["relationships"] = [key: serializedRelationship]
-		} else {
-			var relationships = serializedData["relationships"] as! [String: Any]
-			relationships[key] = serializedRelationship
-			serializedData["relationships"] = relationships
-		}
+        if !options.contains(.OmitNullValues) || (serializedId as? String) != nil {
+        
+            let serializedRelationship = [
+                "data": [
+                    "type": type,
+                    "id": serializedId
+                ]
+            ]
+            
+            if serializedData["relationships"] == nil {
+                serializedData["relationships"] = [key: serializedRelationship]
+            } else {
+                var relationships = serializedData["relationships"] as! [String: Any]
+                relationships[key] = serializedRelationship
+                serializedData["relationships"] = relationships
+            }
+        }
 	}
 	
 	/// Adds the given resources as a to to-many relationship to the serialized data.
