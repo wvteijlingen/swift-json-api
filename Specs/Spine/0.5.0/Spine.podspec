@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name = 'Spine'
-  s.version = '0.6.0'
+  s.version = '0.5.0'
   s.license = 'MIT'
   s.summary = 'A Swift library for interaction with a jsonapi.org API'
-  s.homepage = 'https://github.com/discovery-fusion/dkids_apple_spine'
+  s.homepage = 'https://github.com/DNI-Mercury/Spine'
   s.authors = { 'Ward van Teijlingen' => 'w.van.teijlingen@gmail.com' }
-  s.source = { :git => 'https://github.com/discovery-fusion/dkids_apple_spine.git', :tag => s.version }
+  s.source = { :git => 'https://github.com/DNI-Mercury/Spine.git', :tag => s.version }
 
   s.ios.deployment_target = '8.0'
   s.tvos.deployment_target = '9.0'
