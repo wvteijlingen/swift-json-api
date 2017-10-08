@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'Spine'
-  s.version = '0.3'
+  s.version = '0.4'
   s.license = 'MIT'
   s.summary = 'A Swift library for interaction with a jsonapi.org API'
   s.homepage = 'https://github.com/wvteijlingen/Spine'
@@ -15,6 +15,6 @@ Pod::Spec.new do |s|
 
   s.requires_arc = true
 
-  s.dependency 'SwiftyJSON', '~> 3.1.4'
-  s.dependency 'BrightFutures', '~> 5.0'
+  s.dependency 'SwiftyJSON'
+  s.dependency 'BrightFutures'
 end
