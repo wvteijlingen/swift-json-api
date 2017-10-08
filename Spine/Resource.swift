@@ -162,7 +162,7 @@ open class Resource: NSObject, NSCoding {
 
 extension Resource {
 	override open var description: String {
-		return "\(resourceType)(\(id), \(url))"
+    return "\(resourceType)(\(String(describing: id)), \(String(describing: url)))"
 	}
 	
 	override open var debugDescription: String {
