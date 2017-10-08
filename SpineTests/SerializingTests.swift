@@ -185,7 +185,6 @@ class DeserializingTests: SerializerTests {
 	
 	func testDeserializeMultipleResources() {
 		let fixture = JSONFixtureWithName("MultipleFoos")
-		
 		do {
 			let document = try serializer.deserializeData(fixture.data, mappingTargets: nil)
 			

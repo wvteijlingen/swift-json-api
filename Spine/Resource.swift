@@ -79,6 +79,7 @@ struct RelationshipData {
 
 /// A base recource class that provides some defaults for resources.
 /// You can create custom resource classes by subclassing from Resource.
+@objcMembers
 open class Resource: NSObject, NSCoding {
 	/// The resource type in plural form.
 	open class var resourceType: ResourceType {
@@ -142,6 +143,7 @@ open class Resource: NSObject, NSCoding {
 
 	/// Sets the value for the field named `field` to `value`.
 	func setValue(_ value: Any?, forField field: String) {
+    print(field)
 		setValue(value, forKey: field)
 	}
 

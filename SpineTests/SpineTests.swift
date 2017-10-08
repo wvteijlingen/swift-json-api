@@ -53,7 +53,7 @@ class FindAllTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -66,7 +66,7 @@ class FindAllTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -78,7 +78,7 @@ class FindAllTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 }
@@ -110,7 +110,7 @@ class FindByIDTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -122,7 +122,7 @@ class FindByIDTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -134,7 +134,7 @@ class FindByIDTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 }
@@ -160,7 +160,7 @@ class FindOneByIDTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -172,7 +172,7 @@ class FindOneByIDTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -184,7 +184,7 @@ class FindOneByIDTests: SpineTests {
 		assertFutureFailure(future, withError: SpineError.networkError(networkError), expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 }
@@ -216,7 +216,7 @@ class FindByQueryTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -230,7 +230,7 @@ class FindByQueryTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -244,7 +244,7 @@ class FindByQueryTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 }
@@ -271,7 +271,7 @@ class FindOneByQueryTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -285,7 +285,7 @@ class FindOneByQueryTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -299,7 +299,7 @@ class FindOneByQueryTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 
@@ -325,7 +325,7 @@ class DeleteTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -338,7 +338,7 @@ class DeleteTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -351,7 +351,7 @@ class DeleteTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -412,7 +412,7 @@ class SaveTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 
@@ -432,7 +432,7 @@ class SaveTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 			XCTAssertTrue(resourcePatched)
 		}
 	}
@@ -460,7 +460,7 @@ class SaveTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 			XCTAssertTrue(resourcePatched)
 		}
 	}
@@ -473,7 +473,7 @@ class SaveTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 400, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -485,7 +485,7 @@ class SaveTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 }
@@ -526,7 +526,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 			XCTAssertTrue(relationshipUpdated)
 		}
 	}
@@ -551,7 +551,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 			XCTAssertTrue(relationshipUpdated)
 		}
 	}
@@ -579,7 +579,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 			XCTAssertTrue(relationshipUpdated)
 		}
 	}
@@ -607,7 +607,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 			XCTAssertTrue(relationshipUpdated)
 		}
 	}
@@ -627,7 +627,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 422, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 }
@@ -660,7 +660,7 @@ class PaginatingTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 	
@@ -689,7 +689,7 @@ class PaginatingTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+      XCTAssertNil(error, "\(String(describing: error))")
 		}
 	}
 }
