@@ -192,7 +192,7 @@ class DeleteOperation: ConcurrentOperation {
 			}
 			
 			if statusCodeIsSuccess(statusCode) {
-				self.result = .success()
+        self.result = .success(())
 			} else if let data = responseData , data.count > 0 {
 				do {
 					let document = try self.serializer.deserializeData(data)
@@ -299,7 +299,7 @@ class SaveOperation: ConcurrentOperation {
 			}
 			
 			if success {
-				self.result = .success()
+        self.result = .success(())
 			} else {
 				self.result = .failure(.serverError(statusCode: statusCode!, apiErrors: document?.errors))
 			}
@@ -379,7 +379,7 @@ private class RelationshipOperation: ConcurrentOperation {
 		}
 		
 		if statusCodeIsSuccess(statusCode) {
-			self.result = .success()
+      self.result = .success(())
 		} else if let data = responseData, data.count > 0 {
 			do {
 				let document = try serializer.deserializeData(data)
@@ -458,7 +458,7 @@ private class RelationshipMutateOperation: RelationshipOperation {
 		}
 		
 		guard !relatedResources.isEmpty else {
-			result = .success()
+      result = .success(())
 			state = .finished
 			return
 		}

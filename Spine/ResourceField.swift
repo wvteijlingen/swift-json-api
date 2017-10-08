@@ -37,7 +37,7 @@ open class Field {
 	
 	var isReadOnly: Bool = false
 
-	fileprivate init() {}
+  fileprivate init() {}
 	
 	/// Sets the serialized name.
 	///
