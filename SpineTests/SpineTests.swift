@@ -53,7 +53,7 @@ class FindAllTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+            XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -66,7 +66,7 @@ class FindAllTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+            XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -78,7 +78,7 @@ class FindAllTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 }
@@ -110,7 +110,7 @@ class FindByIDTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -122,7 +122,7 @@ class FindByIDTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -134,7 +134,7 @@ class FindByIDTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 }
@@ -160,7 +160,7 @@ class FindOneByIDTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -172,7 +172,7 @@ class FindOneByIDTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -184,7 +184,7 @@ class FindOneByIDTests: SpineTests {
 		assertFutureFailure(future, withError: SpineError.networkError(networkError), expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 }
@@ -216,7 +216,7 @@ class FindByQueryTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -230,7 +230,7 @@ class FindByQueryTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -244,7 +244,7 @@ class FindByQueryTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 }
@@ -271,7 +271,7 @@ class FindOneByQueryTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -285,7 +285,7 @@ class FindOneByQueryTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -299,7 +299,7 @@ class FindOneByQueryTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 
@@ -325,7 +325,7 @@ class DeleteTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -338,7 +338,7 @@ class DeleteTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 404, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -351,7 +351,7 @@ class DeleteTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -388,7 +388,7 @@ class SaveTests: SpineTests {
 //		assertFutureSuccess(future, expectation: expectation)
 //		
 //		waitForExpectations(timeout: 10) { error in
-//			XCTAssertNil(error, "\(error)")
+//			XCTAssertNil(error, String(describing: error))
 //		}
 //	}
 
@@ -396,7 +396,7 @@ class SaveTests: SpineTests {
 		HTTPClient.handler = { request, payload in
 			XCTAssertEqual(request.httpMethod!, "POST", "HTTP method not as expected.")
 			XCTAssertEqual(request.url!, URL(string:"http://example.com/foos")!, "Request URL not as expected.")
-			let json = JSON(data: payload!)
+			let json = JSON(payload!)
 			XCTAssertEqual(json["data"]["id"].stringValue, "some id")
 			return (responseData: self.fixture.data, statusCode: 201, error: nil)
 		}
@@ -412,7 +412,7 @@ class SaveTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 
@@ -432,7 +432,7 @@ class SaveTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 			XCTAssertTrue(resourcePatched)
 		}
 	}
@@ -444,7 +444,7 @@ class SaveTests: SpineTests {
 			XCTAssertEqual(request.httpMethod!, "PATCH", "HTTP method not as expected.")
 			if(request.url! == URL(string: "http://example.com/foos/1")!) {
 				resourcePatched = true
-				let json = JSON(data: payload!)
+				let json = JSON(payload!)
 				XCTAssertEqual(json["data"]["id"].stringValue, self.foo.id)
 			}
 			return (responseData: self.fixture.data, statusCode: 201, error: nil)
@@ -460,7 +460,7 @@ class SaveTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 			XCTAssertTrue(resourcePatched)
 		}
 	}
@@ -473,7 +473,7 @@ class SaveTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 400, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -485,7 +485,7 @@ class SaveTests: SpineTests {
 		assertFutureFailureWithNetworkError(future, code: 999, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 }
@@ -513,7 +513,7 @@ class SaveRelationshipsTests: SpineTests {
 
 		HTTPClient.handler = { request, payload in
 			if(request.httpMethod! == "PATCH" && request.url!.absoluteString == "http://example.com/foos/1/relationships/to-one-attribute") {
-				let json = JSON(data: payload!)
+				let json = JSON(payload!)
 				if json["data"]["type"].string == "bars" && json["data"]["id"].string == "10" {
 					relationshipUpdated = true
 				}
@@ -526,7 +526,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 			XCTAssertTrue(relationshipUpdated)
 		}
 	}
@@ -536,7 +536,7 @@ class SaveRelationshipsTests: SpineTests {
 		
 		HTTPClient.handler = { request, payload in
 			if(request.httpMethod! == "PATCH" && request.url!.absoluteString == "http://example.com/foos/1/relationships/to-one-attribute") {
-				let json = JSON(data: payload!)
+				let json = JSON(payload!)
 				if json["data"].type == .null {
 					relationshipUpdated = true
 				}
@@ -551,7 +551,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 			XCTAssertTrue(relationshipUpdated)
 		}
 	}
@@ -561,7 +561,7 @@ class SaveRelationshipsTests: SpineTests {
 
 		HTTPClient.handler = { request, payload in
 			if(request.httpMethod! == "POST" && request.url!.absoluteString == "http://example.com/foos/1/relationships/to-many-attribute") {
-				let data = JSON(data: payload!)["data"].arrayValue
+				let data = JSON(payload!)["data"].arrayValue
 				XCTAssertEqual(data.count, 1, "Expected data count to be 1.")
 
 				if data[0]["type"].string == "bars" && data[0]["id"].string == "13" {
@@ -579,7 +579,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 			XCTAssertTrue(relationshipUpdated)
 		}
 	}
@@ -589,7 +589,7 @@ class SaveRelationshipsTests: SpineTests {
 
 		HTTPClient.handler = { request, payload in
 			if(request.httpMethod! == "DELETE" && request.url!.absoluteString == "http://example.com/foos/1/relationships/to-many-attribute") {
-				let data = JSON(data: payload!)["data"].arrayValue
+				let data = JSON(payload!)["data"].arrayValue
 				XCTAssertEqual(data.count, 1, "Expected data count to be 1.")
 
 				if data[0]["type"].string == "bars" && data[0]["id"].string == "11" {
@@ -607,7 +607,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureSuccess(future, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 			XCTAssertTrue(relationshipUpdated)
 		}
 	}
@@ -627,7 +627,7 @@ class SaveRelationshipsTests: SpineTests {
 		assertFutureFailureWithServerError(future, statusCode: 422, expectation: expectation)
 
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 }
@@ -660,7 +660,7 @@ class PaginatingTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 	
@@ -689,7 +689,7 @@ class PaginatingTests: SpineTests {
 		}
 		
 		waitForExpectations(timeout: 10) { error in
-			XCTAssertNil(error, "\(error)")
+			XCTAssertNil(error, String(describing: error))
 		}
 	}
 }

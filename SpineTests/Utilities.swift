@@ -16,7 +16,7 @@ extension XCTestCase {
 	func JSONFixtureWithName(_ name: String) -> (data: Data, json: JSON) {
 		let path = Bundle(for: type(of: self)).url(forResource: name, withExtension: "json")!
 		let data = try! Data(contentsOf: path)
-		let json = JSON(data: data)
+		let json = JSON(data)
 		return (data: data, json: json)
 	}
 }
