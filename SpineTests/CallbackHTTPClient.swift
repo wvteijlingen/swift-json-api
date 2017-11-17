@@ -45,7 +45,7 @@ open class CallbackHTTPClient: NetworkClient {
 					
 					// API Error
 				} else {
-					Spine.logWarning(.networking, "\(statusCode): \(request.url!)")
+                    Spine.logWarning(.networking, "\(String(describing: statusCode)): \(request.url!)")
 				}
 				
 				callback(statusCode, data, error)

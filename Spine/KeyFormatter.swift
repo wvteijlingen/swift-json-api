@@ -35,7 +35,7 @@ public struct DasherizedKeyFormatter: KeyFormatter {
 	let regex: NSRegularExpression
 	
 	public func format(_ name: String) -> String {
-		let dashed = regex.stringByReplacingMatches(in: name, options: NSRegularExpression.MatchingOptions(), range: NSMakeRange(0, name.characters.count), withTemplate: "-$1$2")
+		let dashed = regex.stringByReplacingMatches(in: name, options: NSRegularExpression.MatchingOptions(), range: NSMakeRange(0, name.count), withTemplate: "-$1$2")
 		return dashed.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "-"))
 	}
 	
@@ -49,7 +49,7 @@ public struct UnderscoredKeyFormatter: KeyFormatter {
 	let regex: NSRegularExpression
 	
 	public func format(_ name: String) -> String {
-		let underscored = regex.stringByReplacingMatches(in: name, options: NSRegularExpression.MatchingOptions(), range: NSMakeRange(0, name.characters.count), withTemplate: "_$1$2")
+		let underscored = regex.stringByReplacingMatches(in: name, options: NSRegularExpression.MatchingOptions(), range: NSMakeRange(0, name.count), withTemplate: "_$1$2")
 		return underscored.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "_"))
 	}
 	

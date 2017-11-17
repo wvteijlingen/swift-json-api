@@ -43,7 +43,7 @@ public protocol Router: class {
 	
 	- returns: The URL.
 	*/
-	func urlForQuery<T: Resource>(_ query: Query<T>) -> URL
+	func urlForQuery<T>(_ query: Query<T>) -> URL
 }
 
 /**
@@ -80,7 +80,7 @@ open class JSONAPIRouter: Router {
 		return URL(string: urlString, relativeTo: baseURL)!
 	}
 	
-	open func urlForQuery<T: Resource>(_ query: Query<T>) -> URL {
+	open func urlForQuery<T>(_ query: Query<T>) -> URL {
 		let url: URL
 		let preBuiltURL: Bool
 		
