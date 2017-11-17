@@ -384,7 +384,7 @@ open class Spine {
 			if let error = operation.result?.error {
 				promise.failure(error)
 			} else {
-				promise.success()
+                promise.success(())
 			}
 		}
 
