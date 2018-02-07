@@ -161,24 +161,28 @@ class SerializeOperation: Operation {
 	/// - parameter key:             The key to add to the serialized data.
 	/// - parameter type:            The resource type of the linked resource as defined on the parent resource.
 	fileprivate func addToManyRelationship(_ linkedResources: ResourceCollection?, to serializedData: inout [String: Any], key: String, type: ResourceType) {
-		var resourceIdentifiers: [ResourceIdentifier] = []
-		
-		if let resources = linkedResources?.resources {
-			resourceIdentifiers = resources.filter { $0.id != nil }.map { resource in
-				return ResourceIdentifier(type: resource.resourceType, id: resource.id!)
-			}
-		}
-		
-		let serializedRelationship = [
-			"data": resourceIdentifiers.map { $0.toDictionary() }
-		]
-		
-		if serializedData["relationships"] == nil {
-			serializedData["relationships"] = [key: serializedRelationship]
-		} else {
-			var relationships = serializedData["relationships"] as! [String: Any]
-			relationships[key] = serializedRelationship
-			serializedData["relationships"] = relationships
-		}
+        
+        if !options.contains(.OmitNullValues) || linkedResources != nil {
+            
+            var resourceIdentifiers: [ResourceIdentifier] = []
+            
+            if let resources = linkedResources?.resources {
+                resourceIdentifiers = resources.filter { $0.id != nil }.map { resource in
+                    return ResourceIdentifier(type: resource.resourceType, id: resource.id!)
+                }
+            }
+            
+            let serializedRelationship = [
+                "data": resourceIdentifiers.map { $0.toDictionary() }
+            ]
+            
+            if serializedData["relationships"] == nil {
+                serializedData["relationships"] = [key: serializedRelationship]
+            } else {
+                var relationships = serializedData["relationships"] as! [String: Any]
+                relationships[key] = serializedRelationship
+                serializedData["relationships"] = relationships
+            }
+        }
 	}
 }
