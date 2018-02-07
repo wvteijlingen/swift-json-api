@@ -262,7 +262,7 @@ class DeserializeOperation: Operation {
 		
 		if let linkData = serializedData["relationships"][key].dictionary {
             
-            guard linkData["data"] != nil else {
+            guard linkData["data"] != nil, linkData["data"]!.type != SwiftyJSON.Type.null else {
                 return nil
             }
 
