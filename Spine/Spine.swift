@@ -112,7 +112,7 @@ open class Spine {
 	/// - parameter query: The query describing which resources to fetch.
 	///
 	/// - returns: A future that resolves to a tuple containing the fetched ResourceCollection, the document meta, and the document jsonapi object.
-	open func find<T: Resource>(_ query: Query<T>) -> Future<(resources: ResourceCollection, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
+	open func find<T>(_ query: Query<T>) -> Future<(resources: ResourceCollection, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
 		let promise = Promise<(resources: ResourceCollection, meta: Metadata?, jsonapi: JSONAPIData?), SpineError>()
 
 		let operation = FetchOperation(query: query, spine: self)
@@ -151,7 +151,7 @@ open class Spine {
 	/// - parameter query: The query describing which resource to fetch.
 	///
 	/// - returns: A future that resolves to a tuple containing the fetched resource, the document meta, and the document jsonapi object.
-	open func findOne<T: Resource>(_ query: Query<T>) -> Future<(resource: T, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
+	open func findOne<T>(_ query: Query<T>) -> Future<(resource: T, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
 		let promise = Promise<(resource: T, meta: Metadata?, jsonapi: JSONAPIData?), SpineError>()
 
 		let operation = FetchOperation(query: query, spine: self)
@@ -215,7 +215,7 @@ open class Spine {
 	/// - parameter queryCallback: A optional function that returns the query used to load the resource.
 	///
 	/// - returns: A future that resolves to the loaded resource.
-	open func load<T: Resource>(_ resource: T, queryCallback: ((Query<T>) -> Query<T>)? = nil) -> Future<T, SpineError> {
+	open func load<T>(_ resource: T, queryCallback: ((Query<T>) -> Query<T>)? = nil) -> Future<T, SpineError> {
 		var query = Query(resource: resource)
 		if let callback = queryCallback {
 			query = callback(query)
@@ -237,7 +237,7 @@ open class Spine {
 	/// - parameter queryCallback: A optional function that returns the query used to load the resource.
 	///
 	/// - returns: A future that resolves to the reloaded resource.
-	open func reload<T: Resource>(_ resource: T, queryCallback: ((Query<T>) -> Query<T>)? = nil) -> Future<T, SpineError> {
+	open func reload<T>(_ resource: T, queryCallback: ((Query<T>) -> Query<T>)? = nil) -> Future<T, SpineError> {
 		var query = Query(resource: resource)
 		if let callback = queryCallback {
 			query = callback(query)
@@ -245,7 +245,7 @@ open class Spine {
 		return loadResourceByExecutingQuery(resource, query: query, skipIfLoaded: false)
 	}
 
-	func loadResourceByExecutingQuery<T: Resource>(_ resource: T, query: Query<T>, skipIfLoaded: Bool = true) -> Future<T, SpineError> {
+	func loadResourceByExecutingQuery<T>(_ resource: T, query: Query<T>, skipIfLoaded: Bool = true) -> Future<T, SpineError> {
 		let promise = Promise<T, SpineError>()
 
 		if skipIfLoaded && resource.isLoaded {
@@ -384,7 +384,7 @@ open class Spine {
 			if let error = operation.result?.error {
 				promise.failure(error)
 			} else {
-				promise.success()
+				promise.success(())
 			}
 		}
 

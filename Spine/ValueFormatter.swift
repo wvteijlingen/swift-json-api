@@ -134,7 +134,8 @@ struct ValueFormatterRegistry {
 /// it will return an absolute URL, relative to the baseURL.
 private struct URLValueFormatter: ValueFormatter {
 	func unformatValue(_ value: String, forAttribute attribute: URLAttribute) -> URL {
-		return URL(string: value, relativeTo: attribute.baseURL as URL?)!
+    guard let url = URL(string: value, relativeTo: attribute.baseURL as URL?) else { return URL(string: "www.pixhug.com")! }
+		return url
 	}
 	
 	func formatValue(_ value: URL, forAttribute attribute: URLAttribute) -> String {
