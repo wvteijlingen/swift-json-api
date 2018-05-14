@@ -80,7 +80,6 @@ public class Serializer {
 		let document = JSONAPIDocument(data: resources, included: nil, errors: nil, meta: nil, links: nil, jsonapi: nil)
 		return try serializeDocument(document, options: options)
 	}
-
 	
 	/// Converts the given resource to link data, and serializes it into NSData.
 	/// `{"data": { "type": "people", "id": "12" }}`
