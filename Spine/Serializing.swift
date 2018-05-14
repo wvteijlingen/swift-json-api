@@ -80,12 +80,6 @@ public class Serializer {
 		let document = JSONAPIDocument(data: resources, included: nil, errors: nil, meta: nil, links: nil, jsonapi: nil)
 		return try serializeDocument(document, options: options)
 	}
-    
-    public func serializeResources(_ resources: [Resource], meta: Metadata?, options: SerializationOptions = [.IncludeID]) throws -> Data {
-        let document = JSONAPIDocument(data: resources, included: nil, errors: nil, meta: meta, links: nil, jsonapi: nil)
-        return try serializeDocument(document, options: options)
-    }
-
 	
 	/// Converts the given resource to link data, and serializes it into NSData.
 	/// `{"data": { "type": "people", "id": "12" }}`
