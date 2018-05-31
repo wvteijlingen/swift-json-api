@@ -112,8 +112,8 @@ open class Spine {
 	/// - parameter query: The query describing which resources to fetch.
 	///
 	/// - returns: A future that resolves to a tuple containing the fetched ResourceCollection, the document meta, and the document jsonapi object.
-	open func find<T: Resource>(_ query: Query<T>) -> Future<(resources: ResourceCollection, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
-		let promise = Promise<(resources: ResourceCollection, meta: Metadata?, jsonapi: JSONAPIData?), SpineError>()
+	open func find<T: Resource>(_ query: Query<T>) -> Future<(resources: ResourceCollection<T>, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
+		let promise = Promise<(resources: ResourceCollection<T>, meta: Metadata?, jsonapi: JSONAPIData?), SpineError>()
 
 		let operation = FetchOperation(query: query, spine: self)
 
@@ -121,7 +121,7 @@ open class Spine {
 
 			switch operation.result! {
 			case .success(let document):
-				let response = (ResourceCollection(document: document), document.meta, document.jsonapi)
+				let response = (ResourceCollection<T>(document: document), document.meta, document.jsonapi)
 				promise.success(response)
 			case .failure(let error):
 				promise.failure(error)
@@ -139,7 +139,7 @@ open class Spine {
 	/// - parameter type: The type of resource to fetch.
 	///
 	/// - returns: A future that resolves to a tuple containing the fetched ResourceCollection, the document meta, and the document jsonapi object.
-	open func find<T: Resource>(_ ids: [String], ofType type: T.Type) -> Future<(resources: ResourceCollection, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
+	open func find<T: Resource>(_ ids: [String], ofType type: T.Type) -> Future<(resources: ResourceCollection<T>, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
 		let query = Query(resourceType: type, resourceIDs: ids)
 		return find(query)
 	}
@@ -193,7 +193,7 @@ open class Spine {
 	/// - parameter type: The type of resource to fetch.
 	///
 	/// - returns: A future that resolves to a tuple containing the fetched ResourceCollection, the document meta, and the document jsonapi object.
-	open func findAll<T: Resource>(_ type: T.Type) -> Future<(resources: ResourceCollection, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
+	open func findAll<T: Resource>(_ type: T.Type) -> Future<(resources: ResourceCollection<T>, meta: Metadata?, jsonapi: JSONAPIData?), SpineError> {
 		let query = Query(resourceType: type)
 		return find(query)
 	}
@@ -277,17 +277,17 @@ open class Spine {
 	/// - parameter collection: The collection for which to load the next page.
 	///
 	/// - returns: A future that resolves to the ResourceCollection including the newly loaded resources.
-	open func loadNextPageOfCollection(_ collection: ResourceCollection) -> Future<ResourceCollection, SpineError> {
-		let promise = Promise<ResourceCollection, SpineError>()
+    open func loadNextPageOfCollection<T: Resource>(_ collection: ResourceCollection<T>) -> Future<ResourceCollection<T>, SpineError> {
+		let promise = Promise<ResourceCollection<T>, SpineError>()
 
 		if let nextURL = collection.nextURL {
-			let query = Query(url: nextURL)
+			let query = Query<T>(url: nextURL)
 			let operation = FetchOperation(query: query, spine: self)
 
 			operation.completionBlock = { [unowned operation] in
 				switch operation.result! {
 				case .success(let document):
-					let nextCollection = ResourceCollection(document: document)
+					let nextCollection = ResourceCollection<T>(document: document)
 					collection.resources += nextCollection.resources
 					collection.resourcesURL = nextCollection.resourcesURL
 					collection.nextURL = nextCollection.nextURL
@@ -314,17 +314,17 @@ open class Spine {
 	/// - parameter collection: The collection for which to load the previous page.
 	///
 	/// - returns: A future that resolves to the ResourceCollection including the newly loaded resources.
-	open func loadPreviousPageOfCollection(_ collection: ResourceCollection) -> Future<ResourceCollection, SpineError> {
-		let promise = Promise<ResourceCollection, SpineError>()
+    open func loadPreviousPageOfCollection<T: Resource>(_ collection: ResourceCollection<T>) -> Future<ResourceCollection<T>, SpineError> {
+		let promise = Promise<ResourceCollection<T>, SpineError>()
 
 		if let previousURL = collection.previousURL {
-			let query = Query(url: previousURL)
+			let query = Query<T>(url: previousURL)
 			let operation = FetchOperation(query: query, spine: self)
 
 			operation.completionBlock = { [unowned operation] in
 				switch operation.result! {
 				case .success(let document):
-					let previousCollection = ResourceCollection(document: document)
+					let previousCollection = ResourceCollection<T>(document: document)
 					collection.resources = previousCollection.resources + collection.resources
 					collection.resourcesURL = previousCollection.resourcesURL
 					collection.nextURL = previousCollection.nextURL
@@ -398,7 +398,7 @@ public extension Spine {
 	/// Registers a resource class.
 	///
 	/// - parameter resourceClass: The resource class to register.
-	func registerResource(_ resourceClass: Resource.Type) {
+    func registerResource<T: Resource>(_ resourceClass: T.Type) {
 		serializer.registerResource(resourceClass)
 	}
 

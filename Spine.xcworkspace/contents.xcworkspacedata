@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Reflection/Reflection.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Carthage/Checkouts/SwiftyJSON/SwiftyJSON.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Carthage/Checkouts/BrightFutures/BrightFutures.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Spine.xcodeproj">
+   </FileRef>
+</Workspace>

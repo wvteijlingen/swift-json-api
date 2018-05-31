@@ -29,7 +29,7 @@ public class Serializer {
 	/// - throws: SerializerError that can occur in the deserialization.
 	///
 	/// - returns: A JSONAPIDocument
-	public func deserializeData(_ data: Data, mappingTargets: [Resource]? = nil) throws -> JSONAPIDocument {
+    public func deserializeData(_ data: Data, mappingTargets: [Resource]? = nil) throws -> JSONAPIDocument {
 		let deserializeOperation = DeserializeOperation(data: data, resourceFactory: resourceFactory, valueFormatters: valueFormatters, keyFormatter: keyFormatter)
 		
 		if let mappingTargets = mappingTargets {
@@ -76,8 +76,10 @@ public class Serializer {
 	/// - throws: SerializerError that can occur in the serialization.
 	///
 	/// - returns: Serialized data.
-	public func serializeResources(_ resources: [Resource], options: SerializationOptions = [.IncludeID]) throws -> Data {
-		let document = JSONAPIDocument(data: resources, included: nil, errors: nil, meta: nil, links: nil, jsonapi: nil)
+    public func serializeResources<T: Resource>(_ resources: [T], options: SerializationOptions = [.IncludeID]) throws -> Data {
+        var document = JSONAPIDocument()
+        document.data = resources
+//		let document = JSONAPIDocument(data: resources, included: nil, errors: nil, meta: nil, links: nil, jsonapi: nil)
 		return try serializeDocument(document, options: options)
 	}
 
@@ -93,7 +95,7 @@ public class Serializer {
 	/// - throws: SerializerError that can occur in the serialization.
 	///
 	/// - returns: Serialized data.
-	public func serializeLinkData(_ resource: Resource?) throws -> Data {
+    public func serializeLinkData<T: Resource>(_ resource: T?) throws -> Data {
 		let payloadData: Any
 		
 		if let resource = resource {
@@ -109,7 +111,7 @@ public class Serializer {
 			throw SerializerError.jsonSerializationError(error)
 		}
 	}
-	
+
 	/// Converts the given resources to link data, and serializes it into NSData.
 	/// ```json
 	/// {
@@ -125,7 +127,7 @@ public class Serializer {
 	/// - throws: SerializerError that can occur in the serialization.
 	///
 	/// - returns: Serialized data.
-	public func serializeLinkData(_ resources: [Resource]) throws -> Data {
+    public func serializeLinkData<T: Resource>(_ resources: [T]) throws -> Data {
 		let payloadData: Any
 		
 		if resources.isEmpty {
@@ -167,6 +169,8 @@ public struct JSONAPIDocument {
 	
 	/// Included resources extracted from the response.
 	public var included: [Resource]?
+
+    public var inc: [String: Resource]?
 	
 	/// Errors extracted from the response.
 	public var errors: [APIError]?

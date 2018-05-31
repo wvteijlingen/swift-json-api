@@ -172,11 +172,11 @@ class DeserializingTests: SerializerTests {
 				
 				// To many link
 				XCTAssertNotNil(foo.toManyAttribute, "Deserialized linked resources should not be nil.")
-				if let barCollection = foo.toManyAttribute {
-					for bar in barCollection {
-						XCTAssert(bar is Bar, "Expected relationship resource to be of class 'Bar'.")
-					}
-				}
+//				if let barCollection = foo.toManyAttribute {
+//					for bar in barCollection {
+//						XCTAssert(bar is Bar, "Expected relationship resource to be of class 'Bar'.")
+//					}
+//				}
 			}
 		} catch let error as NSError {
 			XCTFail("Deserialisation failed with error: \(error).")

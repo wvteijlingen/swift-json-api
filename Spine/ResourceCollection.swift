@@ -10,7 +10,7 @@ import Foundation
 import BrightFutures
 
 /// A ResourceCollection represents a collection of resources.
-public class ResourceCollection: NSObject, NSCoding {
+public class ResourceCollection<T: Resource>: NSObject, NSCoding {
 	/// Whether the resources for this collection are loaded.
 	public var isLoaded: Bool = false
 	
@@ -24,21 +24,21 @@ public class ResourceCollection: NSObject, NSCoding {
 	public var previousURL: URL?
 	
 	/// The loaded resources
-	public internal(set) var resources: [Resource] = []
+	public internal(set) var resources: [T] = []
 	
 	
 	// MARK: Initializers
 	
 	public override init() {}
 	
-	public init(resources: [Resource], resourcesURL: URL? = nil) {
+	public init(resources: [T], resourcesURL: URL? = nil) {
 		self.resources = resources
 		self.resourcesURL = resourcesURL
 		self.isLoaded = !resources.isEmpty
 	}
 	
 	init(document: JSONAPIDocument) {
-		self.resources = document.data ?? []
+		self.resources = document.data as? [T] ?? []
 		self.resourcesURL = document.links?["self"] as URL?
 		self.nextURL = document.links?["next"] as URL?
 		self.previousURL = document.links?["previous"] as URL?
@@ -53,7 +53,7 @@ public class ResourceCollection: NSObject, NSCoding {
 		resourcesURL = coder.decodeObject(forKey: "resourcesURL") as? URL
 		nextURL = coder.decodeObject(forKey: "nextURL") as? URL
 		previousURL = coder.decodeObject(forKey: "previousURL") as? URL
-		resources = coder.decodeObject(forKey: "resources") as! [Resource]
+		resources = coder.decodeObject(forKey: "resources") as! [T]
 	}
 	
 	public func encode(with coder: NSCoder) {
@@ -68,7 +68,7 @@ public class ResourceCollection: NSObject, NSCoding {
 	// MARK: Subscript and count
 	
 	/// Returns the loaded resource at the given index.
-	public subscript (index: Int) -> Resource {
+	public subscript (index: Int) -> T {
 		return resources[index]
 	}
 	
@@ -76,34 +76,29 @@ public class ResourceCollection: NSObject, NSCoding {
 	public var count: Int {
 		return resources.count
 	}
-	
-	/// Returns a resource identified by the given type and id,
-	/// or nil if no resource was found.
-	public func resourceWithType(_ type: ResourceType, id: String) -> Resource? {
-		return resources.filter { $0.id == id && $0.resourceType == type }.first
-	}
-	
+
+
 	// MARK: Mutators
 	
 	/// Append `resource` to the collection.
-	public func appendResource(_ resource: Resource) {
+	public func appendResource(_ resource: T) {
 		resources.append(resource)
 	}
 	
 	/// Append `resources` to the collection.
-	public func appendResources(_ resources: [Resource]) {
+	public func appendResources(_ resources: [T]) {
 		for resource in resources {
 			appendResource(resource)
 		}
 	}
 
 	/// Remove `resource` from the collection.
-	open func removeResource(_ resource: Resource) {
+	open func removeResource(_ resource: T) {
 		resources = resources.filter { $0 !== resource }
 	}
 	
 	/// Remove `resources` from the collection.
-	open func removeResources(_ resources: [Resource]) {
+	open func removeResources(_ resources: [T]) {
 		for resource in resources {
 			removeResource(resource)
 		}
@@ -111,7 +106,7 @@ public class ResourceCollection: NSObject, NSCoding {
 }
 
 extension ResourceCollection: Sequence {
-	public typealias Iterator = IndexingIterator<[Resource]>
+	public typealias Iterator = IndexingIterator<[T]>
 	
 	public func makeIterator() -> Iterator {
 		return resources.makeIterator()
@@ -123,20 +118,20 @@ extension ResourceCollection: Sequence {
 ///
 /// A `LinkedResourceCollection` keeps track of resources that are linked and unlinked from the collection.
 /// This allows Spine to make partial updates to the collection when it the parent resource is persisted.
-public class LinkedResourceCollection: ResourceCollection {
+public class LinkedResourceCollection<T: Resource>: ResourceCollection<T> {
 	/// The type/id pairs of resources present in this link.
-	public var linkage: [ResourceIdentifier]?
+	public var linkage: [ResourceIdentifier<T>]?
 	
 	/// The URL of the link object of this collection.
 	public var linkURL: URL?
 	
 	/// Resources added to this linked collection, but not yet persisted.
-	public internal(set) var addedResources: [Resource] = []
+	public internal(set) var addedResources: [T] = []
 	
 	/// Resources removed from this linked collection, but not yet persisted.
-	public internal(set) var removedResources: [Resource] = []
+	public internal(set) var removedResources: [T] = []
 	
-	public init(resourcesURL: URL?, linkURL: URL?, linkage: [ResourceIdentifier]?) {
+	public init(resourcesURL: URL?, linkURL: URL?, linkage: [ResourceIdentifier<T>]?) {
 		super.init(resources: [], resourcesURL: resourcesURL)
 		self.linkURL = linkURL
 		self.linkage = linkage
@@ -145,8 +140,8 @@ public class LinkedResourceCollection: ResourceCollection {
 	public required init?(coder: NSCoder) {
 		super.init(coder: coder)
 		linkURL = coder.decodeObject(forKey: "linkURL") as? URL
-		addedResources = coder.decodeObject(forKey: "addedResources") as! [Resource]
-		removedResources = coder.decodeObject(forKey: "removedResources") as! [Resource]
+		addedResources = coder.decodeObject(forKey: "addedResources") as! [T]
+		removedResources = coder.decodeObject(forKey: "removedResources") as! [T]
 		
 		if let encodedLinkage = coder.decodeObject(forKey: "linkage") as? [NSDictionary] {
 			linkage = encodedLinkage.map { ResourceIdentifier(dictionary: $0) }
@@ -166,31 +161,41 @@ public class LinkedResourceCollection: ResourceCollection {
 	}
 	
 	// MARK: Mutators
+
+    private func index(of resource: T, in resources: [T]) -> Int? {
+        for (index, element) in resources.enumerated() {
+            if element.isEqual(resource) {
+                return index
+            }
+        }
+        return nil
+    }
 	
 	/// Link `resource` to the parent resource by appending it to the collection.
 	/// This marks the resource as newly linked. The relationship will be persisted when
 	/// the parent resource is saved.
-	public func linkResource(_ resource: Resource) {
+    public func linkResource(_ resource: T) {
 		assert(resource.id != nil, "Cannot link resource that hasn't been persisted yet.")
 		
 		resources.append(resource)
 		
-		if let index = removedResources.index(of: resource) {
+        if let index = self.index(of: resource, in: removedResources) { //removedResources.index(of: resource) {
 			removedResources.remove(at: index)
 		} else {
 			addedResources.append(resource)
 		}
+
 	}
 	
 	/// Unlink `resource` from the parent resource by removing it from the collection.
 	/// This marks the resource as unlinked. The relationship will be persisted when
 	/// the parent resource is saved.
-	public func unlinkResource(_ resource: Resource) {
+	public func unlinkResource(_ resource: T) {
 		assert(resource.id != nil, "Cannot unlink resource that hasn't been persisted yet.")
 		
 		resources = resources.filter { $0 !== resource }
 		
-		if let index = addedResources.index(of: resource) {
+        if let index = self.index(of: resource, in: addedResources) { //addedResources.index(of: resource) {
 			addedResources.remove(at: index)
 		} else {
 			removedResources.append(resource)
@@ -200,7 +205,7 @@ public class LinkedResourceCollection: ResourceCollection {
 	/// Link `resources` to the parent resource by appending them to the collection.
 	/// This marks the resources as newly linked. The relationship will be persisted when
 	/// the parent resource is saved.
-	public func linkResources(_ resources: [Resource]) {
+    public func linkResources(_ resources: [T]) {
 		for resource in resources {
 			linkResource(resource)
 		}
@@ -209,7 +214,7 @@ public class LinkedResourceCollection: ResourceCollection {
 	/// Unlink `resources` from the parent resource by removing then from the collection.
 	/// This marks the resources as unlinked. The relationship will be persisted when
 	/// the parent resource is saved.
-	public func unlinkResources(_ resources: [Resource]) {
+	public func unlinkResources(_ resources: [T]) {
 		for resource in resources {
 			unlinkResource(resource)
 		}
@@ -217,7 +222,7 @@ public class LinkedResourceCollection: ResourceCollection {
 	
 	/// Append `resource` to the collection as if it is already linked.
 	/// If it was previously linked or unlinked, this status will be removed.
-	public override func appendResource(_ resource: Resource) {
+	public override func appendResource(_ resource: T) {
 		super.appendResource(resource)
 		removedResources = removedResources.filter { $0 !== resource }
 		addedResources = addedResources.filter { $0 !== resource }
@@ -225,7 +230,7 @@ public class LinkedResourceCollection: ResourceCollection {
 	
 	/// Append `resources` to the collection as if they are already linked.
 	/// If a resource was previously linked or unlinked, this status will be removed.
-	public override func appendResources(_ resources: [Resource]) {
+	public override func appendResources(_ resources: [T]) {
 		for resource in resources {
 			appendResource(resource)
 		}

@@ -62,7 +62,7 @@ public struct Query<T: Resource> {
 	/// - returns: Query
 	public init(resource: T) {
 		assert(resource.id != nil, "Cannot instantiate query for resource, id is nil.")
-		self.resourceType = resource.resourceType
+        self.resourceType = resource.resourceType
 		self.url = resource.url
 		self.resourceIDs = [resource.id!]
 	}
@@ -73,7 +73,7 @@ public struct Query<T: Resource> {
 	/// - parameter resourceCollection: The resource collection whose resources to fetch.
 	///
 	/// - returns: Query
-	public init(resourceType: T.Type, resourceCollection: ResourceCollection) {
+	public init(resourceType: T.Type, resourceCollection: ResourceCollection<T>) {
 		self.resourceType = T.resourceType
 		self.url = resourceCollection.resourcesURL
 	}
@@ -198,7 +198,7 @@ public struct Query<T: Resource> {
 	///
 	/// - parameter relationshipName: The name of the relationship to filter on.
 	/// - parameter resource:         The resource that should be related.
-	public mutating func whereRelationship(_ relationshipName: String, isOrContains resource: Resource) {
+    public mutating func whereRelationship<U: Resource>(_ relationshipName: String, isOrContains resource: U) {
 		assert(resource.id != nil, "Attempt to add a where filter on a relationship, but the target resource does not have an id.")
 		addPredicateWithField(relationshipName, value: resource.id! as AnyObject, type: .equalTo)
 	}
@@ -225,7 +225,7 @@ public struct Query<T: Resource> {
 	///
 	/// - parameter type:       The resource type for which to restrict the properties.
 	/// - parameter fieldNames: Names of fields to fetch.
-	public mutating func restrictFieldsOfResourceType(_ type: Resource.Type, to fieldNames: String...) {
+    public mutating func restrictFieldsOfResourceType<U: Resource>(_ type: U.Type, to fieldNames: String...) {
 		for fieldName in fieldNames {
 			guard let field = type.field(named: fieldName) else {
 				assertionFailure("Cannot restrict to field \(fieldName) of resource \(type.resourceType). No such field has been configured.")

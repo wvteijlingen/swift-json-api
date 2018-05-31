@@ -43,9 +43,9 @@ class FindAllTests: SpineTests {
 			expectation.fulfill()
 			for (index, resource) in fooCollection.enumerated() {
 				XCTAssertEqual(fooCollection.count, 2, "Deserialized resources count not equal.")
-				XCTAssert(resource is Foo, "Deserialized resource should be of class 'Foo'.")
-				let foo = resource as! Foo
-				assertFooResource(foo, isEqualToJSON: fixture.json["data"][index])
+//				XCTAssert(resource is Foo, "Deserialized resource should be of class 'Foo'.")
+//				let foo = resource as! Foo
+				assertFooResource(resource, isEqualToJSON: fixture.json["data"][index])
 			}
 			}.onFailure { error in
 				expectation.fulfill()
@@ -100,9 +100,9 @@ class FindByIDTests: SpineTests {
 			expectation.fulfill()
 			for (index, resource) in fooCollection.enumerated() {
 				XCTAssertEqual(fooCollection.count, 2, "Expected resource count to be 2.")
-				XCTAssert(resource is Foo, "Expected resource to be of class 'Foo'.")
-				let foo = resource as! Foo
-				assertFooResource(foo, isEqualToJSON: fixture.json["data"][index])
+//				XCTAssert(resource is Foo, "Expected resource to be of class 'Foo'.")
+//				let foo = resource as! Foo
+				assertFooResource(resource, isEqualToJSON: fixture.json["data"][index])
 			}
 			}.onFailure { error in
 				expectation.fulfill()
@@ -206,9 +206,9 @@ class FindByQueryTests: SpineTests {
 			expectation.fulfill()
 			for (index, resource) in fooCollection.enumerated() {
 				XCTAssertEqual(fooCollection.count, 2, "Deserialized resources count not equal.")
-				XCTAssert(resource is Foo, "Deserialized resource should be of class 'Foo'.")
-				let foo = resource as! Foo
-				assertFooResource(foo, isEqualToJSON: fixture.json["data"][index])
+//				XCTAssert(resource is Foo, "Deserialized resource should be of class 'Foo'.")
+//				let foo = resource as! Foo
+				assertFooResource(resource, isEqualToJSON: fixture.json["data"][index])
 			}
 			}.onFailure { error in
 				expectation.fulfill()

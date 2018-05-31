@@ -10,7 +10,13 @@ import Foundation
 import XCTest
 import SwiftyJSON
 
-class Foo: Resource {
+class Foo: NSObject, Resource {
+    var resourceData = ResourceData()
+
+    public override required init() {
+
+    }
+
 	var stringAttribute: String?
 	var integerAttribute: NSNumber?
 	var floatAttribute: NSNumber?
@@ -18,27 +24,23 @@ class Foo: Resource {
 	var nilAttribute: AnyObject?
 	var dateAttribute: Date?
 	var toOneAttribute: Bar?
-	var toManyAttribute: LinkedResourceCollection?
+	var toManyAttribute: LinkedResourceCollection<Bar>?
 	
-	override class var resourceType: String {
+	static var resourceType: String {
 		return "foos"
 	}
 	
-	override class var fields: [Field] {
-		return fieldsFromDictionary([
-			"stringAttribute": Attribute(),
-			"integerAttribute": Attribute(),
-			"floatAttribute": Attribute(),
-			"booleanAttribute": BooleanAttribute(),
-			"nilAttribute": Attribute(),
-			"dateAttribute": DateAttribute(),
-			"toOneAttribute": ToOneRelationship(Bar.self),
-			"toManyAttribute": ToManyRelationship(Bar.self)
-		])
-	}
-	
-	required init() {
-		super.init()
+	static var fields: [Field] {
+		return [
+            PlainAttribute("stringAttribute"),
+            PlainAttribute("integerAttribute"),
+            PlainAttribute("floatAttribute"),
+            BooleanAttribute("booleanAttribute"),
+            PlainAttribute("nilAttribute"),
+            DateAttribute("dateAttribute"),
+            ToOneRelationship("toOneAttribute", to: Bar.self),
+            ToManyRelationship("toManyAttribute", to: Bar.self)
+		]
 	}
 	
 	init(id: String) {
@@ -46,28 +48,30 @@ class Foo: Resource {
 		self.id = id
 	}
 
-	required init(coder: NSCoder) {
-		super.init(coder: coder)
-	}
+//	required init(coder: NSCoder) {
+//		super.init(coder: coder)
+//	}
 }
 
-class Bar: Resource {
+class Bar: NSObject, Resource {
+    var resourceData = ResourceData()
+
+    public override required init() {
+
+    }
+
 	var barStringAttribute: String?
 	var barIntegerAttribute: NSNumber?
 	
-	override class var resourceType: String {
+	static var resourceType: String {
 		return "bars"
 	}
 	
-	override class var fields: [Field] {
-		return fieldsFromDictionary([
-			"barStringAttribute": Attribute(),
-			"barIntegerAttribute": Attribute()
-		])
-	}
-	
-	required init() {
-		super.init()
+	static var fields: [Field] {
+		return [
+			PlainAttribute("barStringAttribute"),
+			PlainAttribute("barIntegerAttribute"),
+		]
 	}
 	
 	init(id: String) {
@@ -75,7 +79,7 @@ class Bar: Resource {
 		self.id = id
 	}
 
-	required init(coder: NSCoder) {
-		super.init(coder: coder)
-	}
+//	required init(coder: NSCoder) {
+//		super.init(coder: coder)
+//	}
 }
