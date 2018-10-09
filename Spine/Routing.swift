@@ -157,7 +157,7 @@ open class JSONAPIRouter: Router {
 		if !query.sortDescriptors.isEmpty {
 			let descriptorStrings = query.sortDescriptors.map { descriptor -> String in
 				let field = T.field(named: descriptor.key!)
-				let key = self.keyFormatter.format(field!)
+                let key = field != nil ? self.keyFormatter.format(field!) : descriptor.key!
 				if descriptor.ascending {
 					return key
 				} else {
